@@ -248,8 +248,8 @@
                                                                 $stmt1->execute();
                                                                 $number_of_rows = $stmt1->fetchColumn();
 
-                                                                $sql2 = "SELECT COUNT(*) FROM _tenantRentingInformation WHERE _floorName = :floor AND status = '1'";
-                                                                $stmt1 = $conn->prepare($sql1);
+                                                                $sql2 = "SELECT COUNT(*) FROM _tenantRentingInformation WHERE floorName = :floor AND status = '1'";
+                                                                $stmt1 = $conn->prepare($sql2);
                                                                 $stmt1->bindParam(':floor', $row['floorName']);
                                                                 $stmt1->execute();
                                                                 $number_of_rows1 = $stmt1->fetchColumn();
