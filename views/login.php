@@ -1,29 +1,29 @@
 <?php
-    include ('head.php');
     include ('../controllers/config.php');
-
     if($_POST){
         $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "SELECT * FROM `_owners` WHERE email = :email AND password = :password";
+        $sql = "SELECT COUNT(*) FROM `_owners` WHERE username = :username AND password = :password";
+        
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':username', $username);
         $stmt->bindParam(':password', $password);
 
-        $email = $_POST['email'];
+        $username = $_POST['username'];
         $password = $_POST['password'];
-        $result = $stmt->execute();
-        $count = $result->rowCount();
+        $stmt->execute();
+        $number_of_rows = $stmt->fetchColumn(); 
 
-        if($count == 1){
-            //session start
-            session_register("id");
-            $_SESSION['login_user'] = $current_user;
+       if($number_of_rows == 1) {
+            session_start();
+            session_id();
+            $_SESSION['current_user'] = $_POST['username'];
             header("location: index.php");
+            }
         }
-        else
-            die();
-    }
+?>
+<?php
+    include ('head.php');
 ?>
 <body class="theme-default">
 
@@ -63,12 +63,12 @@
                 <br />
                 <form id="form-validation" name="form-validation" method="POST">
                     <div class="form-group">
-                        <input id="validation-email"
+                        <input id="validation-usesrname"
                                class="form-control"
-                               placeholder="Email or Username"
-                               name="email"
+                               placeholder="Username"
+                               name="username"
                                type="text"
-                               data-validation="[EMAIL]">
+                               data-validation="[USERNAME]">
                     </div>
                     <div class="form-group">
                         <input id="validation-password"
@@ -180,4 +180,3 @@
 <div class="main-backdrop"><!-- --></div>
 
 </body>
-</html>

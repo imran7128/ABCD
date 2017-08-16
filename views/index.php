@@ -1,4 +1,5 @@
 <?php
+    include('../controllers/session.php');
     include('head.php'); 
     include('../controllers/config.php');
  ?>
@@ -184,13 +185,7 @@
                             
                                 <i class="icmn-arrow-up5"></i>
                                 <span class="counter-init" data-from="25" data-to="6"></span>
-                                <?php
-                                    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
-                                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                    $sql = "SELECT floor from _owner_dorm";
-                                    $result = $conn->query($sql);
 
-                                ?>
                             </span>
                         </div>
                     </div>

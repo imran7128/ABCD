@@ -181,97 +181,39 @@
                     <div class="margin-bottom-50">
                         <br />
                         <!-- Horizontal Form -->
-                        <form>
+                        <form  method="POST">
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l0">Default Input</label>
+                                    <label class="form-control-label" for="l0">First Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="password" class="form-control" placeholder="Default Input" id="l0">
+                                    <input type="text" class="form-control" placeholder="First Name" id="l0">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l10">Disabled</label>
+                                    <label class="form-control-label" for="l0">Last Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="password" class="form-control" placeholder="Disabled" disabled="" id="l10">
+                                    <input type="text" class="form-control" placeholder="Last Name" id="l0">
                                 </div>
                             </div>
+
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l11">Readonly</label>
+                                    <label class="form-control-label" for="l0">Birth Date</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="password" class="form-control" placeholder="Readonly" readonly="" id="l11">
+                                    <input type="text" class="form-control datepicker-only-init" placeholder="Select Date" />
                                 </div>
                             </div>
+
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l4">With Actions on Left</label>
+                                    <label class="form-control-label" for="l0">Permanent Address</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <div class="input-group">
-                                        <div class="input-group-btn">
-                                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                                Action
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <a class="dropdown-item" href="javascript: void(0);">Action</a>
-                                                <a class="dropdown-item" href="javascript: void(0);">Another action</a>
-                                                <a class="dropdown-item" href="javascript: void(0);">Something else here</a>
-                                                <li class="dropdown-divider"> </li>
-                                                <a class="dropdown-item" href="javascript: void(0);">Separated link</a>
-                                            </ul>
-                                        </div>
-                                        <input type="text" class="form-control" id="l4">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="l5">With Actions on Right</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="l5">
-                                        <div class="input-group-btn">
-                                            <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
-                                                Action
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item" href="javascript: void(0);">Action</a>
-                                                <a class="dropdown-item" href="javascript: void(0);">Another action</a>
-                                                <a class="dropdown-item" href="javascript: void(0);">Something else here</a>
-                                                <li class="dropdown-divider"> </li>
-                                                <a class="dropdown-item" href="javascript: void(0);">Separated link</a>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="l8">Search</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" name="" placeholder="Search..." id="l8">
-                                        <span class="input-group-btn">
-                                            <a href="javascript: void(0);" class="btn btn-success">
-                                                Search files
-                                            </a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="l1">Block Help</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Enter text" id="l1">
-                                    <small>Technical information for user</small>
+                                    <input type="text" class="form-control" placeholder="Permanent Address" id="l0">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -289,61 +231,40 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l3">Password</label>
+                                    <label class="form-control-label" for="l0">Cellphone Number</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <div class="input-group">
-                                        <input type="password" class="form-control" placeholder="Password" id="l3">
-                                        <span class="input-group-addon">
-                                            <i class="icmn-key"></i>
-                                        </span>
-                                    </div>
+                                    <input type="text" class="form-control" placeholder="Cellphone Number" id="l0">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l6">Left Icon</label>
+                                    <label class="form-control-label" for="l0">Parent/Guardian Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <div class="form-input-icon">
-                                        <i class="icmn-search"></i>
-                                        <input type="text" class="form-control" placeholder="Left icon" id="l6">
-                                    </div>
+                                    <input type="text" class="form-control" placeholder="Parent/Guardian Name" id="l0">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l7">Right Icon</label>
+                                    <label class="form-control-label" for="l0">Parent/Guardian Address</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <div class="form-input-icon form-input-icon-right">
-                                        <i class="icmn-database"></i>
-                                        <input type="text" class="form-control" placeholder="Right icon" id="l7">
-                                    </div>
+                                    <input type="text" class="form-control" placeholder="Parent/Guardian Address" id="l0">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l9">Input With Spinner</label>
+                                    <label class="form-control-label" for="l0">Parent/Guardian Contact No.</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <div class="form-input-icon form-input-icon-right">
-                                        <i class="icmn-spinner11 util-spin"></i>
-                                        <input type="password" class="form-control" placeholder="Password" id="l9">
-                                    </div>
+                                    <input type="text" class="form-control" placeholder="Parent/Guardian Contact No." id="l0">
                                 </div>
                             </div>
+
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label">Static Control</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <p class="form-control-static"> email@example.com </p>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label for="l13">Dropdown</label>
+                                    <label for="l13">Floor</label>
                                 </div>
                                 <div class="col-md-9">
                                     <select class="form-control" id="l13">
@@ -357,7 +278,7 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l14">Multiple Select</label>
+                                    <label class="form-control-label" for="l14">Unit</label>
                                 </div>
                                 <div class="col-md-9">
                                     <select multiple="" class="form-control" id="l14">
@@ -367,24 +288,6 @@
                                         <option>Option 4</option>
                                         <option>Option 5</option>
                                     </select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="l15">Textarea</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <textarea class="form-control" rows="3" id="l15"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="l16">File input</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="file" id="l16">
-                                    <br />
-                                    <small>Technical information for user</small>
                                 </div>
                             </div>
                             <div class="form-actions">
@@ -406,7 +309,24 @@
 
 </div>
 </section>
+<script>
+    $(function(){
 
+        $('.datepicker-only-init').datetimepicker({
+            widgetPositioning: {
+                horizontal: 'left'
+            },
+            icons: {
+                time: "fa fa-clock-o",
+                date: "fa fa-calendar",
+                up: "fa fa-arrow-up",
+                down: "fa fa-arrow-down"
+            },
+            format: 'LL'
+        });
+
+    })
+</script>
 <div class="main-backdrop"><!-- --></div>
 
 </body>

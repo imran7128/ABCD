@@ -5,8 +5,9 @@
             {
                 $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $sql = "INSERT INTO `_owners` (email, password, first_name, last_name, security_question, security_answer) VALUES (:email, :password, :first_name, :last_name, :security_question, :security_answer)";
+                $sql = "INSERT INTO `_owners` (username,email, password, first_name, last_name, security_question, security_answer) VALUES (:username,:email, :password, :first_name, :last_name, :security_question, :security_answer)";
                 $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':username', $username);
                 $stmt->bindParam(':email', $email);
                 $stmt->bindParam(':password', $password);
                 $stmt->bindParam(':first_name', $first_name);
@@ -14,6 +15,7 @@
                 $stmt->bindParam(':security_question', $security_question);
                 $stmt->bindParam(':security_answer', $security_answer);
 
+                $username = $_POST['username'];
                 $email = $_POST['email'];
                 $password = $_POST['password'];
                 $first_name = $_POST['first_name'];
@@ -52,6 +54,14 @@
                 </h3>
                 <br />
                 <form id="register" name="register" method="POST">
+                    <div class="form-group">
+                        <input  id="_username" 
+                                class="form-control"
+                                name="username" 
+                                type="text" data-validation="[L>=1]"
+                                data-validation-message="$ must not be empty"
+                                placeholder="Username">
+                    </div>
                     <div class="form-group">
                         <div class="form-input-icon form-input-icon-right">
                             <i class="icmn-spinner11 util-spin"></i>
