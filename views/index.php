@@ -3,8 +3,8 @@
     include('../controllers/session.php');
     include('head.php'); 
     session_start();
- ?>
-<body class="mode-default colorful-enabled theme-red">
+ 
+echo '<body class="mode-default colorful-enabled theme-red">
 <nav class="left-menu" left-menu>
     <div class="logo-container">
         <a href="index.html" class="logo">
@@ -168,8 +168,8 @@
             </div>
         </div>
     </div>
-</nav>
-
+</nav>';
+?>
 <section class="page-content">
 <div class="page-content-inner">
 
