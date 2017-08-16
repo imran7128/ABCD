@@ -1,5 +1,10 @@
 <?php
+    include('../controllers/config.php');
+    include('../controllers/session.php');
     include('head.php'); 
+    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
  ?>
 <body class="mode-default colorful-enabled theme-red">
 <nav class="left-menu" left-menu>
@@ -174,13 +179,13 @@
     <section class="panel">
         <div class="panel-heading">
             <h3>
-                Active Units
+                Occupied Units
             </h3>
         </div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Summary of Active Tenants</p>
+                    <p>Summary of Active Units</p>
                     <br />
                     <div class="margin-bottom-50">
                         <table class="table table-hover nowrap" id="tblActive" width="100%">
@@ -206,12 +211,28 @@
                             </tfoot>
                             <tbody>
                             <tr>
-                                <td>Damon</td>
-                                <td>5516 Adolfo Green</td>
-                                <td>Littelhaven</td>
-                                <td>85</td>
-                                <td>2014/06/13</td>
-                                <td>$553,536</td>
+                                <?php
+                                    $sql = "SELECT unitName, floorName, tenant, rent FROM _units WHERE userName = :user AND status = '1'";
+                                    $stmt = $conn->prepare($sql);
+                                    $stmt->bindParam(':user', $_SESSION['current_user']);
+                                    $stmt->execute();
+                                    while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                                        echo '<tr>';
+                                        echo '<td>'.$row['floorName'].'</td>';
+                                        echo '<td>'.$row['unitName'].'</td>';
+                                        echo '<td>'.$row['tenant'].'</td>';
+                                        echo '<td>'.$row['rent'].'</td>';
+                                            $sql1 = "SELECT balance, issueDate FROM _tenantRentingInformation WHERE userName = :user AND unitName = :unit";
+                                            $stmt1 = $conn->prepare($sql1);
+                                            $stmt1->bindParam(':user', $_SESSION['current_user']);
+                                            $stmt1->bindParam(':unit', $row['unitName']);
+                                            $stmt1->execute();
+                                            $row1=$stmt1->fetch(PDO::FETCH_ASSOC);
+                                                echo '<td>'.$row1['balance'].'</td>';
+                                                echo '<td>'.$row1['issueDate'].'</td>';
+                                        echo '</tr>';
+                                    }
+                                ?>
                             </tr>
                             </tbody>
                         </table>
@@ -224,13 +245,13 @@
     <section class="panel">
         <div class="panel-heading">
             <h3>
-                Inactive Units
+                Available Units
             </h3>
         </div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Summary of Active Units</p>
+                    <p>Summary of Inactive Units</p>
                     <br />
                     <div class="margin-bottom-50">
                         <table class="table table-hover nowrap" id="tblInactive" width="100%">
@@ -251,12 +272,19 @@
                             </tr>
                             </tfoot>
                             <tbody>
-                            <tr>
-                                <td>Damon</td>
-                                <td>5516 Adolfo Green</td>
-                                <td>Littelhaven</td>
-                                <td>ADD TENANT BUTTON</td>
-                            </tr>
+                            <?php
+                                    $sql = "SELECT unitName, floorName, rent FROM _units WHERE userName = :user AND status = '0'";
+                                    $stmt = $conn->prepare($sql);
+                                    $stmt->bindParam(':user', $_SESSION['current_user']);
+                                    $stmt->execute();
+                                    while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                                        echo '<tr>';
+                                        echo '<td>'.$row['floorName'].'</td>';
+                                        echo '<td>'.$row['unitName'].'</td>';
+                                        echo '<td>'.$row['rent'].'</td>';
+                                        echo '</tr>';
+                                    }
+                            ?>
                             </tbody>
                         </table>
                     </div>
