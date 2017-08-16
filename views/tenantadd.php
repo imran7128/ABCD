@@ -1,4 +1,36 @@
 <?php
+    include('../controllers/config.php');
+    include('../controllers/session.php');
+    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    if(isset($_POST['submit']))
+    {
+        $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, address, email, contactNumber, guardianName, guardianAddress, guardianContact, owner, userName, password) VALUES (:name1, :name2, :adrs, :mail, :cn, :gn, :ga, :gc, :onr, '1','1')";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':name1', $firstName);
+        $stmt->bindParam(':name2', $lastName);
+        $stmt->bindParam(':adrs', $address);
+        $stmt->bindParam(':mail', $email);
+        $stmt->bindParam(':cn', $contactNumber);
+        $stmt->bindParam(':gn', $guardianName);
+        $stmt->bindParam(':ga', $guardianAddress);
+        $stmt->bindParam(':gc', $guardianContact);
+        $stmt->bindParam(':onr', $owner);
+
+        $firstName= $_POST['firstName'];
+        $lastName= $_POST['lastName'];
+        $address= $_POST['address'];
+        $email= $_POST['email'];
+        $contactNumber= $_POST['contactNumber'];
+        $guardianName= $_POST['guardianName'];
+        $guardianAddress= $_POST['guardianAddress'];
+        $guardianContact= $_POST['guardianContact'];
+        $owner= $_SESSION['current_user'];
+        $stmt->execute();
+
+    }
+ ?>
+ <?php       
     include('head.php'); 
  ?>
 <body class="mode-default colorful-enabled theme-red">
@@ -187,7 +219,7 @@
                                     <label class="form-control-label" for="l0">First Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="First Name" id="l0">
+                                    <input type="text" class="form-control" placeholder="First Name" id="l0" name="firstName">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -195,16 +227,7 @@
                                     <label class="form-control-label" for="l0">Last Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Last Name" id="l0">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="l0">Birth Date</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control datepicker-only-init" placeholder="Select Date" />
+                                    <input type="text" class="form-control" placeholder="Last Name" id="l0" name="lastName">
                                 </div>
                             </div>
 
@@ -213,7 +236,7 @@
                                     <label class="form-control-label" for="l0">Permanent Address</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Permanent Address" id="l0">
+                                    <input type="text" class="form-control" placeholder="Permanent Address" id="l0" name="address">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -225,7 +248,7 @@
                                         <span class="input-group-addon">
                                             <i class="icmn-mail2"></i>
                                         </span>
-                                        <input type="email" class="form-control" placeholder="Email Address" id="l2">
+                                        <input type="email" class="form-control" placeholder="Email Address" id="l2" name="email">
                                     </div>
                                 </div>
                             </div>
@@ -234,7 +257,7 @@
                                     <label class="form-control-label" for="l0">Cellphone Number</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Cellphone Number" id="l0">
+                                    <input type="text" class="form-control" placeholder="Cellphone Number" id="l0" name="contactNumber">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -242,7 +265,7 @@
                                     <label class="form-control-label" for="l0">Parent/Guardian Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Parent/Guardian Name" id="l0">
+                                    <input type="text" class="form-control" placeholder="Parent/Guardian Name" id="l0" name="guardianName">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -250,7 +273,7 @@
                                     <label class="form-control-label" for="l0">Parent/Guardian Address</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Parent/Guardian Address" id="l0">
+                                    <input type="text" class="form-control" placeholder="Parent/Guardian Address" id="l0" name="guardianAddress">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -258,7 +281,7 @@
                                     <label class="form-control-label" for="l0">Parent/Guardian Contact No.</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Parent/Guardian Contact No." id="l0">
+                                    <input type="text" class="form-control" placeholder="Parent/Guardian Contact No." id="l0" name="guardianContact">
                                 </div>
                             </div>
 
@@ -293,7 +316,7 @@
                             <div class="form-actions">
                                 <div class="form-group row">
                                     <div class="col-md-9 col-md-offset-3">
-                                        <button type="button" class="btn width-150 btn-primary">Submit</button>
+                                        <button type="submit" name="submit" class="btn width-150 btn-primary">Submit</button>
                                         <button type="button" class="btn btn-default">Cancel</button>
                                     </div>
                                 </div>
