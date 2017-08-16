@@ -1,4 +1,26 @@
 <?php
+    include('../controllers/config.php');
+    include('../controllers/session.php');
+
+    //1 is occupied, 0 is available
+
+        $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        if(isset($_POST['submit'])){
+            $sql = "INSERT INTO `_units` (rent, unitName, floorName, userName, tenant, status) VALUES (:rent, :unit, :floor, :user, '0', '0')";
+            $stmt=$conn->prepare($sql);
+            $stmt->bindParam(':rent', $rent);
+            $stmt->bindParam(':unit', $unit);
+            $stmt->bindParam(':floor', $floor);
+            $stmt->bindParam(':user', $_SESSION['current_user']);
+
+            $rent = $_POST['rent'];
+            $unit = $_POST['unit'];
+            $floor = $_POST['floor'];
+            $stmt->execute();
+        }
+        
+
     include('head.php'); 
  ?>
 <body class="mode-default colorful-enabled theme-red">
@@ -181,18 +203,22 @@
                     <div class="margin-bottom-50">
                         <br />
                         <!-- Horizontal Form -->
-                        <form>
+                        <form method="POST" name="addUnit" action="unitadd.php">
                             <div class="form-group row">
                                 <div class="col-md-3">
                                     <label for="l13">Floor</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <select class="form-control" id="l13">
-                                        <option>Option 1</option>
-                                        <option>Option 2</option>
-                                        <option>Option 3</option>
-                                        <option>Option 4</option>
-                                        <option>Option 5</option>
+                                    <select class="form-control" id="l13" name="floor">
+                                        <?php
+                                            $sql = "SELECT floorName FROM _floors WHERE userName = :user";
+                                            $stmt = $conn->prepare($sql);
+                                            $stmt->bindParam(':user', $_SESSION['current_user']);
+                                            $stmt->execute();
+                                            while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                                                echo '<option value="'.$row['floorName'].'">'.$row['floorName'].'</option>';
+                                            }
+                                        ?>
                                     </select>
                                 </div>
                             </div>
@@ -202,7 +228,7 @@
                                     <label class="form-control-label" for="l0">Unit Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Unit Name" id="l0">
+                                    <input type="text" class="form-control" placeholder="Unit Name" id="l0" name="unit">
                                 </div>
                             </div>
 
@@ -211,14 +237,14 @@
                                     <label class="form-control-label" for="l0">Rent Per Month</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Unit Name" id="l0">
+                                    <input type="text" class="form-control" placeholder="Monthly Rent" id="l0", name="rent">
                                 </div>
                             </div>
 
                             <div class="form-actions">
                                 <div class="form-group row">
                                     <div class="col-md-9 col-md-offset-3">
-                                        <button type="button" class="btn width-150 btn-primary">Submit</button>
+                                        <button type="submit" class="btn width-150 btn-primary" name="submit">Submit</button>
                                         <button type="button" class="btn btn-default">Cancel</button>
                                     </div>
                                 </div>
