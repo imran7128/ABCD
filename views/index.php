@@ -1,7 +1,8 @@
 <?php
+    include('../controllers/config.php');
     include('../controllers/session.php');
     include('head.php'); 
-    include('../controllers/config.php');
+    session_start();
  ?>
 <body class="mode-default colorful-enabled theme-red">
 <nav class="left-menu" left-menu>
@@ -184,8 +185,16 @@
                             <span class="counter-count">
                             
                                 <i class="icmn-arrow-up5"></i>
-                                <span class="counter-init" data-from="25" data-to="6"></span>
-
+                                <?php
+                                    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+                                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                    $sql = "SELECT COUNT(*) FROM _floors WHERE userName = :user";
+                                    $stmt = $conn->prepare($sql);
+                                    $stmt->bindParam(':user', $_SESSION['current_user']);
+                                    $stmt->execute();
+                                    $number_of_rows = $stmt->fetchColumn();
+                                    echo '<span class="counter-init" data-from="3" data-to="'.$number_of_rows.'"></span>';
+                                ?>               
                             </span>
                         </div>
                     </div>
@@ -199,7 +208,16 @@
                             <i class="counter-icon icmn-home"></i>
                             <span class="counter-count">
                                 <i class="icmn-arrow-down5"></i>
-                                <span class="counter-init" data-from="0" data-to="24"></span>
+                                <?php
+                                    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+                                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                    $sql = "SELECT COUNT(*) FROM _units WHERE userName = :user";
+                                    $stmt = $conn->prepare($sql);
+                                    $stmt->bindParam(':user', $_SESSION['current_user']);
+                                    $stmt->execute();
+                                    $number_of_rows = $stmt->fetchColumn();
+                                    echo '<span class="counter-init" data-from="0" data-to="'.$number_of_rows.'"></span>';
+                                ?>   
                             </span>
                         </div>
                     </div>
@@ -213,7 +231,16 @@
                             <i class="counter-icon icmn-users"></i>
                             <span class="counter-count">
                                 <i class="icmn-arrow-up5"></i>
-                                <span class="counter-init" data-from="0" data-to="67"></span>
+                                <?php
+                                    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+                                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                    $sql = "SELECT COUNT(*) FROM _tenantRentingInformation WHERE userName = :user AND status = '1'";
+                                    $stmt = $conn->prepare($sql);
+                                    $stmt->bindParam(':user', $_SESSION['current_user']);
+                                    $stmt->execute();
+                                    $number_of_rows = $stmt->fetchColumn();
+                                    echo '<span class="counter-init" data-from="0" data-to="'.$number_of_rows.'"></span>';
+                                ?> 
                             </span>
                         </div>
                     </div>
@@ -227,7 +254,16 @@
                             <i class="counter-icon icmn-stack-text"></i>
                             <span class="counter-count">
                                 <i class="icmn-arrow-up5"></i>
-                                <span class="counter-init" data-from="0" data-to="900000"></span>
+                                <?php
+                                    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+                                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                    $sql = "SELECT SUM(balance) FROM _tenantRentingInformation WHERE userName = :user AND status = '1'";
+                                    $stmt = $conn->prepare($sql);
+                                    $stmt->bindParam(':user', $_SESSION['current_user']);
+                                    $stmt->execute();
+                                    $number_of_rows = $stmt->fetchColumn();
+                                    echo '<span class="counter-init" data-from="0" data-to="'.$number_of_rows.'"></span>';
+                                ?> 
                             </span>
                         </div>
                     </div>
