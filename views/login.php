@@ -77,8 +77,8 @@
                             </label>
                         </div>
                     </div>
-                    <div class="form-actions">
-                        <button type="submit" name="submit" class="btn btn-primary width-150">Sign In</button>
+                    <div class="form-actions" name="submit">
+                        <button type="submit" class="btn btn-primary width-150">Sign In</button>
                     </div>
                 </form>
             </div>
