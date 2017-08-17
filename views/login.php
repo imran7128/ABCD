@@ -1,6 +1,6 @@
 <?php
     include ('../controllers/config.php');
-    if($_POST){
+    if($_POST){      
         $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $sql = "SELECT COUNT(*) FROM `_owners` WHERE username = :username AND password = :password";
@@ -40,16 +40,6 @@
                     </a>
                 </div>
             </div>
-            <div class="col-lg-8">
-                <div class="single-page-block-header-menu">
-                    <ul class="list-unstyled list-inline">
-                        <li><a href="javascript: history.back();">&larr; Back</a></li>
-                        <li class="active"><a href="javascript: void(0);">Login</a></li>
-                        <li><a href="javascript: void(0);">About</a></li>
-                        <li><a href="javascript: void(0);">Support</a></li>
-                    </ul>
-                </div>
-            </div>
         </div>
     </div>
     <div class="single-page-block">
@@ -87,21 +77,12 @@
                             </label>
                         </div>
                     </div>
-                    <div class="form-actions" name="submit">
-                        <button type="submit" class="btn btn-primary width-150">Sign In</button>
+                    <div class="form-actions">
+                        <button type="submit" name="submit" class="btn btn-primary width-150">Sign In</button>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
-    <div class="single-page-block-footer text-center">
-        <ul class="list-unstyled list-inline">
-            <li><a href="javascript: void(0);">Terms of Use</a></li>
-            <li class="active"><a href="javascript: void(0);">Compliance</a></li>
-            <li><a href="javascript: void(0);">Confidential Information</a></li>
-            <li><a href="javascript: void(0);">Support</a></li>
-            <li><a href="javascript: void(0);">Contacts</a></li>
-        </ul>
     </div>
     <!-- End Login Page -->
 
