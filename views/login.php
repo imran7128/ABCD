@@ -64,12 +64,12 @@
                 <br />
                 <form id="form-validation" name="form-validation" method="POST">
                     <div class="form-group">
-                        <input id="validation-usesrname"
+                        <input id="validation-username[username]"
                                class="form-control"
                                placeholder="Username"
                                name="username"
                                type="text"
-                               data-validation="[USERNAME]">
+                               data-validation="[NOTEMPTY]">
                     </div>
                     <div class="form-group">
                         <input id="validation-password"

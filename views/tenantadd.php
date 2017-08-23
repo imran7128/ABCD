@@ -6,7 +6,6 @@
     if(isset($_POST['submit']))
     {
         $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, address, email, contactNumber, guardianName, guardianAddress, guardianContact, owner, userName, password) VALUES (:name1, :name2, :adrs, :mail, :cn, :gn, :ga, :gc, :onr, :username, :password)";
-        
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name1', $firstName);
         $stmt->bindParam(':name2', $lastName);
@@ -33,6 +32,16 @@
         $owner= $_SESSION['current_user'];
         $stmt->execute();
 
+        $sql = "SELECT id FROM `_tenantprofile` WHERE username = :username AND password = :password";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':username', $userName);
+        $stmt->bindParam(':password', $password);
+        $result = $stmt->execute();
+
+        $sql = "INSERT INTO `_tenantrentinginformation` (id, status, startDate, endDate ) VALUES (:id, '0')";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $result['id']);
+        $stmt->execute();
     }
  ?>
  <?php       
@@ -218,13 +227,14 @@
                     <div class="margin-bottom-50">
                         <br />
                         <!-- Horizontal Form -->
-                        <form  method="POST">
+                        <form  id="mainf" name="mainf" method="POST">
                             <div class="form-group row">
                                 <div class="col-md-3">
                                     <label class="form-control-label" for="l0">First Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="First Name" id="l0" name="firstName">
+                                    <input type="text" class="form-control" placeholder="First Name" id="l0" name="firstName"
+                                    data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -232,7 +242,8 @@
                                     <label class="form-control-label" for="l0">Last Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Last Name" id="l0" name="lastName">
+                                    <input type="text" class="form-control" placeholder="Last Name" id="l0" name="lastName"
+                                    data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
 
@@ -241,7 +252,8 @@
                                     <label class="form-control-label" for="l0">Permanent Address</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Permanent Address" id="l0" name="address">
+                                    <input type="text" class="form-control" placeholder="Permanent Address" id="l0" name="address"
+                                    data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -253,7 +265,8 @@
                                         <span class="input-group-addon">
                                             <i class="icmn-mail2"></i>
                                         </span>
-                                        <input type="email" class="form-control" placeholder="Email Address" id="l2" name="email">
+                                        <input type="email" class="form-control" placeholder="Email Address" id="l2" name="email"
+                                        data-validation=[EMAIL]>
                                     </div>
                                 </div>
                             </div>
@@ -262,7 +275,8 @@
                                     <label class="form-control-label" for="l0">Cellphone Number</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Cellphone Number" id="l0" name="contactNumber">
+                                    <input type="text" class="form-control" placeholder="Cellphone Number" id="l0" name="contactNumber"
+                                    data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -270,7 +284,8 @@
                                     <label class="form-control-label" for="l0">Parent/Guardian Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Parent/Guardian Name" id="l0" name="guardianName">
+                                    <input type="text" class="form-control" placeholder="Parent/Guardian Name" id="l0" name="guardianName"
+                                    data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -278,7 +293,8 @@
                                     <label class="form-control-label" for="l0">Parent/Guardian Address</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Parent/Guardian Address" id="l0" name="guardianAddress">
+                                    <input type="text" class="form-control" placeholder="Parent/Guardian Address" id="l0" name="guardianAddress" 
+                                    data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -286,38 +302,68 @@
                                     <label class="form-control-label" for="l0">Parent/Guardian Contact No.</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Parent/Guardian Contact No." id="l0" name="guardianContact">
+                                    <input type="text" class="form-control" placeholder="Parent/Guardian Contact No." id="l0" name="guardianContact"
+                                    data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
 
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label for="l13">Floor</label>
+                                    <label for="floorName">Floor</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <select class="form-control" id="l13">
-                                        <option>Option 1</option>
-                                        <option>Option 2</option>
-                                        <option>Option 3</option>
-                                        <option>Option 4</option>
-                                        <option>Option 5</option>
+                                    <select class="form-control" id="floorName" name="floorName" onclick="setOptions(this.value);">
+                                    <option>Select Floor</option>
+                                    <?php
+                                            $sql = "SELECT floorName FROM `_floors` WHERE userName = :user";
+                                            $stmt = $conn->prepare($sql);
+                                            $stmt->bindParam(':user', $_SESSION['current_user']);
+                                            $stmt->execute();
+                                            while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                                                echo '<option value="'.$row['floorName'].'">'.$row['floorName'].'</option>';
+                                            }
+                                    ?>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l14">Unit</label>
+                                    <label class="form-control-label" for="unitName">Unit</label>
                                 </div>
-                                <div class="col-md-9">
-                                    <select multiple="" class="form-control" id="l14">
-                                        <option>Option 1</option>
-                                        <option>Option 2</option>
-                                        <option>Option 3</option>
-                                        <option>Option 4</option>
-                                        <option>Option 5</option>
+                                <div class="col-md-6">
+                                    <select class="form-control" id="unitName" name="unitName" onclick="changeRent(this.value)">   
                                     </select>
                                 </div>
+                                <div class="col-md-3" name="rent" id="rent">
+                                    <input type="text" class="form-control" placeholder="0" name="rentamt" readonly="" id="rentamt">
+                                </div>
                             </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="rangeDate">Rent Duration</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="col-md-6">
+                                        <input placeholder="From" type='text' class="form-control" id='startDate' name="startDate" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input placeholder="To" type='text' class="form-control" id='endDate' name="endDate" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="collectionDay">Collection Day</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="margin-bottom-5">
+                                        <input type="text" id="collectionDay" name="collectionDay" value="" />
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-actions">
                                 <div class="form-group row">
                                     <div class="col-md-9 col-md-offset-3">
@@ -337,8 +383,49 @@
 
 </div>
 </section>
+
+<script type="text/javascript">
+    function setOptions(selectedValue) {
+    var selbox = document.mainf.unitName;
+    var dataString = selectedValue;
+    $.ajax
+        ({
+            type: "POST",
+            url: "../controllers/unitName.php",
+            data: {floor :dataString},
+            cache: false,
+            success: function(result)
+            {   
+                $("#unitName").html(result);
+            } 
+        });
+}
+</script>
+<script type="text/javascript">
+    function changeRent(selectedValue) {
+    var selbox = document.mainf.rent;
+    var dataString = selectedValue;
+    $.ajax
+        ({
+            type: "POST",
+            url: "../controllers/changeRent.php",
+            data: {unit :dataString},
+            cache: false,
+            success: function(result)
+            {   
+                $("#rent").html(result);
+            } 
+        });
+    }
+</script>
 <script>
     $(function(){
+        $('#startDate').datetimepicker({
+                format: 'DD-MM-YYYY',
+        });
+        $('#endDate').datetimepicker({
+                format: 'DD-MM-YYYY'
+        });
 
         $('.datepicker-only-init').datetimepicker({
             widgetPositioning: {
@@ -353,8 +440,72 @@
             format: 'LL'
         });
 
+        $('#mainf').validate({
+            submit: {
+                settings: {
+                    inputContainer: '.form-group',
+                    errorListClass: 'form-control-error',
+                    errorClass: 'has-danger'
+                }
+            }
+        });
+
+        $('#mainf').validate({
+            submit: {
+                settings: {
+                    inputContainer: '.form-group',
+                    errorListClass: 'form-control-error-list',
+                    errorClass: 'has-danger'
+                }
+            }
+        });
+
+
+        $("#collectionDay").ionRangeSlider({
+            type: "single",
+            min: 1,
+            max: 30,
+            from: 15,
+            step: 1,
+            grid: true,
+            grid_num: 1,
+            onFinish:  function (data) {
+            console.log(data);
+            var collection = $("#collectionDay").val();
+
+            var date2 = $("#endDate").val();
+            var date1 = $("#startDate").val();
+
+
+                date1 = date1.split('-');
+                date2 = date2.split('-');
+                endDay = date2[0];
+                startDay = date1[0];
+                date1 = new Date(date1[2], date1[1], date1[0]);
+                date2 = new Date(date2[2], date2[1], date2[0]);
+                date1_unixtime = parseInt(date1.getTime() / 1000);
+                date2_unixtime = parseInt(date2.getTime() / 1000);
+                var timeDifference = date2_unixtime - date1_unixtime;
+                var timeDifferenceInHours = timeDifference / 60 / 60;
+                var timeDifferenceInDays = timeDifferenceInHours  / 24;
+                console.log(timeDifferenceInDays);
+
+
+                var quotient = Math.floor(timeDifferenceInDays/30);
+                var remainder = timeDifferenceInDays % 30;
+                alert("The tenant will have "+quotient+" paying months with "+remainder+" days to spare");
+            }
+        });
+
+        $('.select2').select2();
+        $('.select2-tags').select2({
+            tags: true,
+            tokenSeparators: [',', ' ']
+        });
+
     })
 </script>
+
 <div class="main-backdrop"><!-- --></div>
 
 </body>
