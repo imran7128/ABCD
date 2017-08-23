@@ -5,7 +5,8 @@
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     if(isset($_POST['submit']))
     {
-        $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, address, email, contactNumber, guardianName, guardianAddress, guardianContact, owner, userName, password) VALUES (:name1, :name2, :adrs, :mail, :cn, :gn, :ga, :gc, :onr, '1','1')";
+        $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, address, email, contactNumber, guardianName, guardianAddress, guardianContact, owner, userName, password) VALUES (:name1, :name2, :adrs, :mail, :cn, :gn, :ga, :gc, :onr, :username, :password)";
+        
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name1', $firstName);
         $stmt->bindParam(':name2', $lastName);
@@ -16,7 +17,11 @@
         $stmt->bindParam(':ga', $guardianAddress);
         $stmt->bindParam(':gc', $guardianContact);
         $stmt->bindParam(':onr', $owner);
+        $stmt->bindParam(':username', $userName);
+        $stmt->bindParam(':password', $password);
 
+        $userName = $firstName . $_SESSION['current_user_id'];
+        $password = $lastName . $_SESSION['current_user_id'];
         $firstName= $_POST['firstName'];
         $lastName= $_POST['lastName'];
         $address= $_POST['address'];

@@ -1,9 +1,9 @@
 <?php
     include ('../controllers/config.php');
-    if($_POST){      
+    if($_POST){
         $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "SELECT COUNT(*) FROM `_owners` WHERE username = :username AND password = :password";
+        $sql = "SELECT COUNT(*), id FROM `_owners` WHERE username = :username AND password = :password";
         
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $username);
@@ -11,13 +11,14 @@
 
         $username = $_POST['username'];
         $password = $_POST['password'];
-        $stmt->execute();
+        $result = $stmt->execute();
         $number_of_rows = $stmt->fetchColumn(); 
 
        if($number_of_rows == 1) {
             session_start();
             session_id();
             $_SESSION['current_user'] = $_POST['username'];
+            $_SESSION['current_user_id'] = $_result['id'];
             header("location: index.php");
             }
         }
@@ -38,6 +39,16 @@
                     <a href="javascript: history.back();">
                         <img src="../assets/common/img/logo.png" alt="Clean UI Admin Template" />
                     </a>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="single-page-block-header-menu">
+                    <ul class="list-unstyled list-inline">
+                        <li><a href="javascript: history.back();">&larr; Back</a></li>
+                        <li class="active"><a href="javascript: void(0);">Login</a></li>
+                        <li><a href="javascript: void(0);">About</a></li>
+                        <li><a href="javascript: void(0);">Support</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -83,6 +94,15 @@
                 </form>
             </div>
         </div>
+    </div>
+    <div class="single-page-block-footer text-center">
+        <ul class="list-unstyled list-inline">
+            <li><a href="javascript: void(0);">Terms of Use</a></li>
+            <li class="active"><a href="javascript: void(0);">Compliance</a></li>
+            <li><a href="javascript: void(0);">Confidential Information</a></li>
+            <li><a href="javascript: void(0);">Support</a></li>
+            <li><a href="javascript: void(0);">Contacts</a></li>
+        </ul>
     </div>
     <!-- End Login Page -->
 

@@ -2,9 +2,9 @@
     include('../controllers/config.php');
     include('../controllers/session.php');
     include('head.php'); 
-    session_start();
- 
-echo '<body class="mode-default colorful-enabled theme-red">
+    //session_start();
+?>
+<body class="mode-default colorful-enabled theme-red">
 <nav class="left-menu" left-menu>
     <div class="logo-container">
         <a href="index.html" class="logo">
@@ -168,8 +168,8 @@ echo '<body class="mode-default colorful-enabled theme-red">
             </div>
         </div>
     </div>
-</nav>';
-?>
+</nav>
+
 <section class="page-content">
 <div class="page-content-inner">
 
@@ -234,7 +234,8 @@ echo '<body class="mode-default colorful-enabled theme-red">
                                 <?php
                                     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
                                     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                    $sql = "SELECT COUNT(*) FROM _tenantRentingInformation WHERE userName = :user AND status = '1'";
+                                    $sql = "SELECT _tenantrentinginformation.`status`, _tenantprofile.userName FROM _tenantrentinginformation
+                                            INNER JOIN _tenantprofile ON _tenantrentinginformation.id = _tenantprofile.id WHERE userName = :user AND status='1'";
                                     $stmt = $conn->prepare($sql);
                                     $stmt->bindParam(':user', $_SESSION['current_user']);
                                     $stmt->execute();
@@ -257,7 +258,8 @@ echo '<body class="mode-default colorful-enabled theme-red">
                                 <?php
                                     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
                                     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                    $sql = "SELECT SUM(balance) FROM _tenantRentingInformation WHERE userName = :user AND status = '1'";
+                                    $sql = "SELECT SUM(balance) FROM _tenantrentinginformation
+                                    INNER JOIN _tenantprofile ON _tenantrentinginformation.id = _tenantprofile.id WHERE owner = :user";
                                     $stmt = $conn->prepare($sql);
                                     $stmt->bindParam(':user', $_SESSION['current_user']);
                                     $stmt->execute();
