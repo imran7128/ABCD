@@ -273,59 +273,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xl-12">
-                <div class="widget widget-six">
-                    <div class="widget-header">
-                        <div class="dropdown pull-right">
-                        </div>
-                        <strong class="margin-right-10">Growth, %</strong>
-                        <span class="margin-right-10 nowrap">
-                            <span class="donut donut-primary"></span>
-                            Income
-                        </span>
-                        <span class="margin-right-10 nowrap">
-                            <span class="donut donut-success"></span>
-                            Outcome
-                        </span>
-                    </div>
-                    <div class="widget-body">
-                        <div class="chart-overlapping-bar height-250 chartist"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xl-3 col-lg-6 col-sm-6 col-xs-12">
-                <div class="widget widget-seven">
-                    <div class="carousel-widget carousel slide" data-ride="carousel">
-                        <div class="carousel-inner" role="listbox">
-                            <div class="carousel-item active">
-                                <div class="widget-body">
-                                    <div class="widget-body-icon">
-                                        <i class="icmn-accessibility"></i>
-                                    </div>
-                                    <a href="javascript: void(0);" class="widget-body-inner">
-                                        <h2>Sales Growth</h2>
-                                        <p>View Report</p>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="carousel-item">
-                                <div class="widget-body">
-                                    <div class="widget-body-icon">
-                                        <i class="icmn-download"></i>
-                                    </div>
-                                    <a href="javascript: void(0);" class="widget-body-inner">
-                                        <h2>Renter Growth</h2>
-                                        <p>View Report</p>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-lg-6 col-sm-6 col-xs-12">
+            <div class="col-xl-4 col-lg-12 col-sm-12 col-xs-12">
                 <div class="widget widget-seven">
                     <div class="carousel-widget-2 carousel slide" data-ride="carousel">
                         <div class="carousel-inner" role="listbox">
@@ -357,7 +305,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-6 col-sm-6 col-xs-12">
+            <div class="col-xl-4 col-lg-12 col-sm-12 col-xs-12">
                 <div class="widget widget-seven background-danger">
                     <div class="carousel-widget carousel slide" data-ride="carousel">
                         <div class="carousel-inner" role="listbox">
@@ -386,7 +334,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-6 col-sm-6 col-xs-12">
+            <div class="col-xl-4 col-lg-12 col-sm-12 col-xs-12">
                 <div class="widget widget-seven background-info" style="background-image: url(../assets/common/img/temp/photos/9.jpeg)">
                     <div class="carousel-widget-2 carousel slide" data-ride="carousel">
                         <div class="carousel-inner" role="listbox">

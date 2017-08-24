@@ -1,4 +1,5 @@
 <?php
+    //2 days difference will be considered 1 month,but the  31 are included
     include('../controllers/config.php');
     include('../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
@@ -357,9 +358,41 @@
                                 <div class="col-md-3">
                                     <label class="form-control-label" for="collectionDay">Collection Day</label>
                                 </div>
-                                <div class="col-md-9">
+                                <div class="col-md-6">
                                     <div class="margin-bottom-5">
                                         <input type="text" id="collectionDay" name="collectionDay" value="" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="additionalPayment" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">Total Rent Cost</h4>
+                                        </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <label>Total number of months</label>
+                                            <input type="text" class="form-control" placeholder="0" name="totalMonth" readonly="" id="totalMonth">
+                                            <label>Excess number of days</label>
+                                            <input type="text" class="form-control" placeholder="0" name="totalDays" readonly="" id="totalDays">
+                                            <label>Total Rent (Months)</label>
+                                            <input type="text" class="form-control" placeholder="0" name="totalMRent" readonly="" id="totalMRent">
+                                            <label>Additional Payment</label>
+                                            <input type="text" class="form-control" placeholder="Additional Payment" id="addPayment" name="addPayment" value="0">
+                                            <label>Discount</label>
+                                            <input type="text" class="form-control" placeholder="Discount" id="disc" name="disc" value="0">
+                                        </form>
+                                        
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+                                        <button type="submit" action="submit" name="submit" class="btn btn-primary">Save</button>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -470,7 +503,6 @@
             grid: true,
             grid_num: 1,
             onFinish:  function (data) {
-            console.log(data);
             var collection = $("#collectionDay").val();
 
             var date2 = $("#endDate").val();
@@ -493,7 +525,15 @@
 
                 var quotient = Math.floor(timeDifferenceInDays/30);
                 var remainder = timeDifferenceInDays % 30;
-                alert("The tenant will have "+quotient+" paying months with "+remainder+" days to spare");
+                var t = document.getElementById('rentamt');
+                var totalPayment = quotient * t.value;
+
+                //alert("The tenant will have "+quotient+" paying months with "+remainder+" days to spare");
+                $('#additionalPayment').modal('show');
+                $('.modal-body #totalMonth').val(quotient);
+                $('.modal-body #totalMRent').val(totalPayment);
+                $('.modal-body #totalDays').val(remainder);
+
             }
         });
 
