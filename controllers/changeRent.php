@@ -14,7 +14,7 @@
 
         $stmt->execute();
         while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
-            echo '<input type="text" class="form-control" placeholder="'.$row['rent'].'" name="rentamt" readonly="" id="rentamt">';
+            echo '<input type="text" class="form-control" value="'.$row['rent'].'" name="rentamt" readonly="" id="rentamt">';
         }
         //echo '<input type="text" class="form-control" placeholder="'.$result['rent'].'" name="rentamt" readonly="" id="rentamt">';
 	}
