@@ -5,7 +5,7 @@
 	if($_POST['floor']){
 		$conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     	$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT unitName FROM `_units` WHERE userName = :user AND floorName = :floorname";
+		$sql = "SELECT unitName FROM `_units` WHERE userName = :user AND floorName = :floorname AND status='0'";
 		
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':user', $_SESSION['current_user']);
