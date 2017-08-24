@@ -1,29 +1,29 @@
 <?php
     //2 days difference will be considered 1 month,but the  31 are included
+    //dapat isa isa munang nag vavalidate
+    //status 1 is active
+    //unit status 1 is not available
+    //unit tenant is tenant id
+    //unit username is owner
+    //do something with additional payment and discount -- include to invoice?
+    //check for duplicate entry before save
     include('../controllers/config.php');
     include('../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    if(isset($_POST['submit']))
-    {
-        $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, address, email, contactNumber, guardianName, guardianAddress, guardianContact, owner, userName, password) VALUES (:name1, :name2, :adrs, :mail, :cn, :gn, :ga, :gc, :onr, :username, :password)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':name1', $firstName);
-        $stmt->bindParam(':name2', $lastName);
-        $stmt->bindParam(':adrs', $address);
-        $stmt->bindParam(':mail', $email);
-        $stmt->bindParam(':cn', $contactNumber);
-        $stmt->bindParam(':gn', $guardianName);
-        $stmt->bindParam(':ga', $guardianAddress);
-        $stmt->bindParam(':gc', $guardianContact);
-        $stmt->bindParam(':onr', $owner);
-        $stmt->bindParam(':username', $userName);
-        $stmt->bindParam(':password', $password);
 
-        $userName = $firstName . $_SESSION['current_user_id'];
-        $password = $lastName . $_SESSION['current_user_id'];
+    if(isset($_POST['firstName'])){
+        $totalMonths = $_POST['totalMonth'];
+        $balance = $_POST['totalMRent'];
+        $additionalPayment = $_POST['addPayment'];
+        $discount = $_POST['disc'];
+        $adjustedRentPerMonth = $_POST['aRPMt'];
+        $downpayment = $_POST['downpayment'];
+
         $firstName= $_POST['firstName'];
         $lastName= $_POST['lastName'];
+        $userName = $firstName . $_SESSION['current_user_id'];
+        $password = $lastName . $_SESSION['current_user_id'];
         $address= $_POST['address'];
         $email= $_POST['email'];
         $contactNumber= $_POST['contactNumber'];
@@ -31,19 +31,62 @@
         $guardianAddress= $_POST['guardianAddress'];
         $guardianContact= $_POST['guardianContact'];
         $owner= $_SESSION['current_user'];
+        $floorName = $_POST['floorName'];
+        $unitName = $_POST['unitName'];
+        $startDate = $_POST['startDate'];
+        $endDate = $_POST['endDate'];
+        $collectionDay = $_POST['collectionDay'];
+        $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, username, password, address, email, contactNumber, guardianName, guardianAddress, guardianContact, owner) VALUES (:firstName, :lastName, :username, :password, :address, :email, :contactNumber, :guardianName, :guardianAddress, :guardianContact, :owner)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam('firstName',$firstName);
+        $stmt->bindParam('lastName',$lastName);
+        $stmt->bindParam('username',$userName);
+        $stmt->bindParam('password',$password);
+        $stmt->bindParam('address',$address);
+        $stmt->bindParam('email',$email);
+        $stmt->bindParam('contactNumber',$contactNumber);
+        $stmt->bindParam('guardianName',$guardianName);
+        $stmt->bindParam('guardianAddress',$guardianAddress);
+        $stmt->bindParam('guardianContact',$guardianContact);
+        $stmt->bindParam('owner',$_SESSION['current_user']);
         $stmt->execute();
 
         $sql = "SELECT id FROM `_tenantprofile` WHERE username = :username AND password = :password";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $userName);
         $stmt->bindParam(':password', $password);
-        $result = $stmt->execute();
-
-        $sql = "INSERT INTO `_tenantrentinginformation` (id, status, startDate, endDate ) VALUES (:id, '0')";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':id', $result['id']);
         $stmt->execute();
+        $row = $stmt->fetch();
+
+
+        $sql = "INSERT INTO `_tenantrentinginformation` (status, floorName, unitName, downpayment, startDate, endDate, totalMonths, collectionDay, balance, adjustedRentPerMonth, tenant_id) VALUES ('1', :floorName, :unitName, :downpayment, :startDate, :endDate, :totalMonths, :collectionDay, :balance, :adjustedRentPerMonth, :tenant_id)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':floorName',$floorName);
+        $stmt->bindParam(':unitName',$unitName);
+        $stmt->bindParam(':downpayment',$downpayment);
+        $stmt->bindParam(':startDate',$startDate);
+        $stmt->bindParam(':endDate',$endDate);
+        $stmt->bindParam(':totalMonths',$totalMonths);
+        $stmt->bindParam(':collectionDay',$collectionDay);
+        $stmt->bindParam(':balance',$balance);
+        $stmt->bindParam(':adjustedRentPerMonth',$adjustedRentPerMonth);
+        $stmt->bindParam('tenant_id', $row['id']);
+        $stmt->execute();
+
+        $sql = "UPDATE `_units` SET status = '1', tenant = :tenant WHERE userName = :username AND unitName = :unit";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam('tenant', $row['id']);
+        $stmt->bindParam('username',$_SESSION['current_user']);
+        $stmt->bindParam('unit', $unitName);
+        $stmt->execute();
+
+        echo "<script>alert('Success!');</script>";
     }
+
+    
+    /*
+        
+    */
  ?>
  <?php       
     include('head.php'); 
@@ -332,7 +375,7 @@
                                     <label class="form-control-label" for="unitName">Unit</label>
                                 </div>
                                 <div class="col-md-6">
-                                    <select class="form-control" id="unitName" name="unitName" onclick="changeRent(this.value)">   
+                                    <select class="form-control" placeholder="Select Unit" id="unitName" name="unitName" onclick="changeRent(this.value)">   
                                     </select>
                                 </div>
                                 <div class="col-md-3" name="rent" id="rent">
@@ -356,43 +399,88 @@
 
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="collectionDay">Collection Day</label>
+                                    <label class="form-control-label" for="collectionDay"><br />Collection Day</label>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-9">
                                     <div class="margin-bottom-5">
                                         <input type="text" id="collectionDay" name="collectionDay" value="" />
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="modal fade" id="additionalPayment" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                            <h4 class="modal-title" id="myModalLabel">Total Rent Cost</h4>
-                                        </div>
-                                    <div class="modal-body">
-                                        <form>
-                                            <label>Total number of months</label>
-                                            <input type="text" class="form-control" placeholder="0" name="totalMonth" readonly="" id="totalMonth">
-                                            <label>Excess number of days</label>
-                                            <input type="text" class="form-control" placeholder="0" name="totalDays" readonly="" id="totalDays">
-                                            <label>Total Rent (Months)</label>
-                                            <input type="text" class="form-control" placeholder="0" name="totalMRent" readonly="" id="totalMRent">
-                                            <label>Additional Payment</label>
-                                            <input type="text" class="form-control" placeholder="Additional Payment" id="addPayment" name="addPayment" value="0">
-                                            <label>Discount</label>
-                                            <input type="text" class="form-control" placeholder="Discount" id="disc" name="disc" value="0">
-                                        </form>
-                                        
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="collectionDay">Total number of months</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="margin-bottom-5">
+                                        <input type="text" class="form-control" placeholder="0" name="totalMonth" readonly="" id="totalMonth">
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn" data-dismiss="modal">Cancel</button>
-                                        <button type="submit" action="submit" name="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="collectionDay">Excess number of days</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="margin-bottom-5">
+                                        <input type="text" class="form-control" placeholder="0" name="totalDays" readonly="" id="totalDays">
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="collectionDay">Total Rent Due</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="margin-bottom-5">
+                                        <input type="text" class="form-control" placeholder="0" name="totalMRent" readonly="" id="totalMRent">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="collectionDay">Downpayment</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="margin-bottom-5">
+                                        <input type="text" class="form-control" placeholder="Downpayment" id="downpayment" name="downpayment" value=0 onchange="changeTotal();" onkeyup="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="collectionDay">Required Additional Payment</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="margin-bottom-5">
+                                        <input type="text" class="form-control" placeholder="Additional Payment" id="addPayment" name="addPayment" value=0 onchange="changeTotal();" onkeyup="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="collectionDay">Discount</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="margin-bottom-5">
+                                       <input type="text" class="form-control" placeholder="Discount" id="disc" name="disc" value=0 onchange="changeTotal();" onkeyup="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label name="aRPM" id="aRPM">Adjusted Rent Per Month</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="margin-bottom-5" name="aRPMdiv" id="aRPMdiv">
+                                       <input type="text" class="form-control" placeholder="" name="aRPMt" readonly="" id="aRPMt" value="0">
                                     </div>
                                 </div>
                             </div>
@@ -400,13 +488,13 @@
                             <div class="form-actions">
                                 <div class="form-group row">
                                     <div class="col-md-9 col-md-offset-3">
-                                        <button type="submit" name="submit" class="btn width-150 btn-primary">Submit</button>
+                                        <button type="submit" class="btn width-150 btn-primary">Submit</button>
                                         <button type="button" class="btn btn-default">Cancel</button>
                                     </div>
                                 </div>
                             </div>
                         </form>
-                        <!-- End Horizontal Form -->
+                        
                     </div>
                 </div>
             </div>
@@ -451,6 +539,35 @@
         });
     }
 </script>
+<script type="text/javascript">
+    function changeTotal(){
+        var addP = document.getElementById('addPayment');
+        var disc = document.getElementById('disc');
+        var runningTotal = document.getElementById('totalMRent');
+        var totalMonth = document.getElementById('totalMonth');
+        var dp = document.getElementById('downpayment');
+
+        a = parseInt(runningTotal.value) + parseInt(addP.value);
+        b = a - parseInt(disc.value) - parseInt(dp.value);
+        var total = parseFloat(b/parseInt(totalMonth.value));
+        var selbox = document.mainf.aRPM;
+        console.log(a + "a");
+        console.log(b + "b");
+        $.ajax
+        ({
+            type: "POST",
+            url: "../controllers/adjustedRentPerMonth.php",
+            data: {totalR :total},
+            cache: false,
+            success: function(result)
+            {   
+                $("#aRPMdiv").html(result);
+            } 
+        })
+
+    }
+</script>
+
 <script>
     $(function(){
         $('#startDate').datetimepicker({
@@ -498,17 +615,14 @@
             type: "single",
             min: 1,
             max: 30,
-            from: 15,
+            from: 1,
             step: 1,
             grid: true,
             grid_num: 1,
             onFinish:  function (data) {
-            var collection = $("#collectionDay").val();
-
-            var date2 = $("#endDate").val();
-            var date1 = $("#startDate").val();
-
-
+                var collection = $("#collectionDay").val();
+                var date2 = $("#endDate").val();
+                var date1 = $("#startDate").val();
                 date1 = date1.split('-');
                 date2 = date2.split('-');
                 endDay = date2[0];
@@ -527,13 +641,13 @@
                 var remainder = timeDifferenceInDays % 30;
                 var t = document.getElementById('rentamt');
                 var totalPayment = quotient * t.value;
-
+                console.log(totalPayment + "total amount");
+                console.log(t.value + "total rentamt");
                 //alert("The tenant will have "+quotient+" paying months with "+remainder+" days to spare");
-                $('#additionalPayment').modal('show');
-                $('.modal-body #totalMonth').val(quotient);
-                $('.modal-body #totalMRent').val(totalPayment);
-                $('.modal-body #totalDays').val(remainder);
-
+                $('#aRPMt').val(totalPayment);                
+                $('#totalMonth').val(quotient);
+                $('#totalMRent').val(totalPayment);
+                $('#totalDays').val(remainder);
             }
         });
 
@@ -545,7 +659,6 @@
 
     })
 </script>
-
 <div class="main-backdrop"><!-- --></div>
 
 </body>
