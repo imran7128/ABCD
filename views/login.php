@@ -3,7 +3,7 @@
     if($_POST){
         $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "SELECT COUNT(*), id FROM `_owners` WHERE username = :username AND password = :password";
+        $sql = "SELECT COUNT(*), id FROM `_owner` WHERE username = :username AND password = :password";
         
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $username);
@@ -11,14 +11,18 @@
 
         $username = $_POST['username'];
         $password = $_POST['password'];
-        $result = $stmt->execute();
-        $number_of_rows = $stmt->fetchColumn(); 
+        $stmt->execute();
+        $row=$stmt->fetch(PDO::FETCH_ASSOC);
 
-       if($number_of_rows == 1) {
+       if($row['id'] != 0) {
             session_start();
             session_id();
             $_SESSION['current_user'] = $_POST['username'];
-            $_SESSION['current_user_id'] = $_result['id'];
+            $_SESSION['id'] = $row['id'];
+            $_SESSION['usuccess'] = 'undefined';
+            $_SESSION['tsuccess'] = 'undefined';
+            $_SESSION['foor_id'] = 'undefined';
+            $_SESSION['floor_delete_by_user'] = 'undefined';
             header("location: index.php");
             }
         }

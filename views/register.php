@@ -5,7 +5,7 @@
             {
                 $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $sql = "INSERT INTO `_owners` (username,email, password, first_name, last_name, security_question, security_answer) VALUES (:username,:email, :password, :first_name, :last_name, :security_question, :security_answer)";
+                $sql = "INSERT INTO `_owner` (username, email, password, first_name, last_name, security_question, security_answer) VALUES (:username,:email, :password, :first_name, :last_name, :security_question, :security_answer)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(':username', $username);
                 $stmt->bindParam(':email', $email);

@@ -16,48 +16,26 @@
     </div>
     <div class="left-menu-inner scroll-pane">
         <ul class="left-menu-list left-menu-list-root list-unstyled">
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-success"></span> All Good 
-                </div>
-            </li>
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-danger"></span> Sumting Wong
-                </div>
-            </li>
-            <li class="left-menu-list-separator "><!-- --></li>
             <li>
-                <a class="left-menu-link" href="index.php">
-                    <i class="left-menu-link-icon icmn-home2"><!-- --></i>
-                    <span class="menu-top-hidden">Dashboard</span>
+                <a class="left-menu-link" href="admin.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
+                    Dashboard
                 </a>
             </li>
                 <li class="left-menu-list-separator"><!-- -->
             </li>
+            
             <li>
-                <a class="left-menu-link" href="floors.php">
+                <a class="left-menu-link" href="afloors.php">
                     <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
                     Floors
                 </a>
             </li>
-            <li class="left-menu-list-submenu left-menu-list-active">
-                <a class="left-menu-link" href="javascript: void(0);">
-                    <i class="left-menu-link-icon icmn-files-empty2"><!-- --></i>
-                    Unit Information
+            <li class="left-menu-list-active">
+                <a class="left-menu-link" href="aunits.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
+                    Units
                 </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="unitsummary.php">
-                           Unit List
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="unitadd.php">
-                            Add Unit
-                        </a>
-                    </li>
-                </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
             <li class="left-menu-list-submenu">

@@ -7,11 +7,16 @@
     //unit username is owner
     //do something with additional payment and discount -- include to invoice?
     //check for duplicate entry before save
+    //if already registered, and want to rent more than 1 room, do not add to renting profile
+    //dd-mm-yyy
+    //kulang ng deposit
     include('../controllers/config.php');
     include('../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    if(isset($_GET['fid'])){
 
+    }
     if(isset($_POST['firstName'])){
         $totalMonths = $_POST['totalMonth'];
         $balance = $_POST['totalMRent'];
@@ -22,8 +27,8 @@
 
         $firstName= $_POST['firstName'];
         $lastName= $_POST['lastName'];
-        $userName = $firstName . $_SESSION['current_user_id'];
-        $password = $lastName . $_SESSION['current_user_id'];
+        $userName = $firstName.$_SESSION['id'];
+        $password = $lastName.$_SESSION['id'];
         $address= $_POST['address'];
         $email= $_POST['email'];
         $contactNumber= $_POST['contactNumber'];
@@ -36,7 +41,7 @@
         $startDate = $_POST['startDate'];
         $endDate = $_POST['endDate'];
         $collectionDay = $_POST['collectionDay'];
-        $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, username, password, address, email, contactNumber, guardianName, guardianAddress, guardianContact, owner) VALUES (:firstName, :lastName, :username, :password, :address, :email, :contactNumber, :guardianName, :guardianAddress, :guardianContact, :owner)";
+        $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, username, password, address, email, contactNumber, guardianName, guardianAddress, guardianContact, oid, balance) VALUES (:firstName, :lastName, :username, :password, :address, :email, :contactNumber, :guardianName, :guardianAddress, :guardianContact, :oid, :balance)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam('firstName',$firstName);
         $stmt->bindParam('lastName',$lastName);
@@ -48,7 +53,8 @@
         $stmt->bindParam('guardianName',$guardianName);
         $stmt->bindParam('guardianAddress',$guardianAddress);
         $stmt->bindParam('guardianContact',$guardianContact);
-        $stmt->bindParam('owner',$_SESSION['current_user']);
+        $stmt->bindParam('oid',$_SESSION['id']);
+        $stmt->bindParam('balance',$balance);
         $stmt->execute();
 
         $sql = "SELECT id FROM `_tenantprofile` WHERE username = :username AND password = :password";
@@ -56,13 +62,19 @@
         $stmt->bindParam(':username', $userName);
         $stmt->bindParam(':password', $password);
         $stmt->execute();
-        $row = $stmt->fetch();
+        $tenantid=$stmt->fetch(PDO::FETCH_ASSOC);
 
-
-        $sql = "INSERT INTO `_tenantrentinginformation` (status, floorName, unitName, downpayment, startDate, endDate, totalMonths, collectionDay, balance, adjustedRentPerMonth, tenant_id) VALUES ('1', :floorName, :unitName, :downpayment, :startDate, :endDate, :totalMonths, :collectionDay, :balance, :adjustedRentPerMonth, :tenant_id)";
+        $sql = "SELECT _unit.id FROM _unit INNER JOIN _floor ON _unit.floor_id = _floor.id WHERE _floor.oid = :id AND _unit.unitName = :unit";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':floorName',$floorName);
-        $stmt->bindParam(':unitName',$unitName);
+        $stmt->bindParam(':id', $_SESSION['id']);
+        $stmt->bindParam(':unit', $unitName);
+        $stmt->execute();
+        $unitid=$stmt->fetch(PDO::FETCH_ASSOC);
+
+
+
+        $sql = "INSERT INTO `_tenantrentinginformation` (tid, uid, downpayment, startDate, endDate, totalMonths, collectionDay, balance, adjustedRentPerMonth) VALUES (:tid, :uid, :downpayment, :startDate, :endDate, :totalMonths, :collectionDay, :balance, :adjustedRentPerMonth)";
+        $stmt = $conn->prepare($sql);
         $stmt->bindParam(':downpayment',$downpayment);
         $stmt->bindParam(':startDate',$startDate);
         $stmt->bindParam(':endDate',$endDate);
@@ -70,17 +82,73 @@
         $stmt->bindParam(':collectionDay',$collectionDay);
         $stmt->bindParam(':balance',$balance);
         $stmt->bindParam(':adjustedRentPerMonth',$adjustedRentPerMonth);
-        $stmt->bindParam('tenant_id', $row['id']);
+        $stmt->bindParam('tid', $tenantid['id']);
+        $stmt->bindParam('uid', $unitid['id']);
         $stmt->execute();
 
-        $sql = "UPDATE `_units` SET status = '1', tenant = :tenant WHERE userName = :username AND unitName = :unit";
+        $sql = "UPDATE `_unit` SET currentTenant = currentTenant + :add WHERE id = :uid";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam('tenant', $row['id']);
-        $stmt->bindParam('username',$_SESSION['current_user']);
-        $stmt->bindParam('unit', $unitName);
-        $stmt->execute();
+        $add = 1;
+        $stmt->bindParam('uid', $unitid['id']);
+        $stmt->bindParam('add', $add);
+        if($stmt->execute()){
+                $_SESSION['tsuccess'] = 'success';
+            }
+            else{
+                $_SESSION['tsuccess'] = 'fail';
 
-        echo "<script>alert('Success!');</script>";
+            }
+
+        //dd-mm-yyy
+        $startDate = explode('-', $startDate);
+        $day = $startDate[0];
+        $month   = $startDate[1];
+        $year  = $startDate[2];
+
+        $sql = "SELECT id FROM _tenantrentinginformation WHERE tid = :tid";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam('tid', $tenantid['id']);
+        $stmt->execute();   
+        $description = 'Monthly Bill';    
+        $trids = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach($trids as $trid){
+                while($totalMonths > 0){
+                        if($collectionDay > $day){
+                            if($month == 12){
+                                $year += 1;
+                                $month = 1;
+                            }
+                            else{
+                                $month += 1;
+                            }
+                            $fday = $collectionDay."-".$month."-".$year;
+                        }
+                        if($collectionDay < $day){
+                            if($month == 12){
+                                $month = 1;
+                                $year += 1;    
+                            }
+                            else{
+                                $month += 1;
+                            }
+                            $fday = $collectionDay."-".$month."-".$year;
+                        }
+                                sleep(0.5);
+                            
+                                $totalMonths -= 1;
+                                $sql = "INSERT INTO _bill (tid, trid, description, amount, date) VALUES (:tid, :trid, :description,:amount, :day)";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->bindParam(':tid', $tenantid['id']);
+                                $stmt->bindParam(':trid', $trid['id']);
+                                $stmt->bindParam(':day', $fday);
+                                $stmt->bindParam(':amount', $adjustedRentPerMonth);
+                                $stmt->bindParam(':description', $description);
+                                $stmt->execute();
+
+                }
+                
+        }
+   
     }
 
     
@@ -356,15 +424,22 @@
                                     <label for="floorName">Floor</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <select class="form-control" id="floorName" name="floorName" onclick="setOptions(this.value);">
-                                    <option>Select Floor</option>
+                                    <select class="form-control" id="floorName" name="floorName" <?php if(!isset($_GET['uid']) && !isset($_GET['fid'])) {echo 'onclick="setOptions(this.value);"';}?>>
+                                    <!--<option>Select Floor</option>-->
                                     <?php
-                                            $sql = "SELECT floorName FROM `_floors` WHERE userName = :user";
-                                            $stmt = $conn->prepare($sql);
-                                            $stmt->bindParam(':user', $_SESSION['current_user']);
+                                            if(isset($_GET['uid']) && isset($_GET['fid'])){
+                                                $sql = "SELECT id,floorName FROM _floor WHERE oid= :id AND id = :fid";
+                                                $stmt = $conn->prepare($sql);
+                                                $stmt->bindParam(':fid', $_GET['fid']);
+                                            }
+                                            else{
+                                                $sql = "SELECT id,floorName FROM `_floor` WHERE oid = :id";
+                                                $stmt = $conn->prepare($sql);
+                                            }
+                                            $stmt->bindParam(':id', $_SESSION['id']);
                                             $stmt->execute();
                                             while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
-                                                echo '<option value="'.$row['floorName'].'">'.$row['floorName'].'</option>';
+                                                echo '<option value="'.$row['id'].'">'.$row['floorName'].'</option>';
                                             }
                                     ?>
                                     </select>
@@ -375,11 +450,30 @@
                                     <label class="form-control-label" for="unitName">Unit</label>
                                 </div>
                                 <div class="col-md-6">
-                                    <select class="form-control" placeholder="Select Unit" id="unitName" name="unitName" onclick="changeRent(this.value)">   
-                                    </select>
+                                    <?php
+                                        if(isset($_GET['uid']) && isset($_GET['fid'])){
+                                                $sql = "SELECT unitName, rentPerTenant FROM _unit WHERE id = :id";
+                                                $stmt = $conn->prepare($sql);
+                                                $stmt->bindParam(':id', $_GET['uid']);
+                                                $stmt->execute();
+                                                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                                            ?>
+                                            <select class="form-control" placeholder="Select Unit" id="unitName" name="unitName"> 
+                                            <option value="<?php echo $_GET['uid']?>"><?php echo $result['unitName']?></option>
+                                            </select>
+                                            <?php
+                                        }
+                                        else{?>
+                                            <select class="form-control" placeholder="Select Unit" id="unitName" name="unitName" onclick="changeRent(this.value)"" data-validation=[NOTEMPTY]>   
+                                            </select>
+                                            <?php
+                                        }
+                                    ?>
+                                    
                                 </div>
                                 <div class="col-md-3" name="rent" id="rent">
-                                    <input type="text" class="form-control" placeholder="0" name="rentamt" readonly="" id="rentamt">
+                                    <input type="text" class="form-control" placeholder="0" name="rentamt" readonly="" id="rentamt" <?php if(isset($_GET['uid']) && isset($_GET['fid'])){echo 'value="'.$result['rentPerTenant'].'"';}?>>
                                 </div>
                             </div>
 
@@ -389,10 +483,10 @@
                                 </div>
                                 <div class="col-md-9">
                                     <div class="col-md-6">
-                                        <input placeholder="From" type='text' class="form-control" id='startDate' name="startDate" />
+                                        <input placeholder="From" type='text' class="form-control" id='startDate' name="startDate" data-validation=[NOTEMPTY] />
                                     </div>
                                     <div class="col-md-6">
-                                        <input placeholder="To" type='text' class="form-control" id='endDate' name="endDate" />
+                                        <input placeholder="To" type='text' class="form-control" id='endDate' name="endDate" data-validation=[NOTEMPTY] />
                                     </div>
                                 </div>
                             </div>
@@ -550,6 +644,7 @@
         a = parseInt(runningTotal.value) + parseInt(addP.value);
         b = a - parseInt(disc.value) - parseInt(dp.value);
         var total = parseFloat(b/parseInt(totalMonth.value));
+        alert(total);
         var selbox = document.mainf.aRPM;
         console.log(a + "a");
         console.log(b + "b");
@@ -567,9 +662,14 @@
 
     }
 </script>
+<script type="text/javascript">
+    function showSuccess(e){
 
+    }
+</script>
 <script>
     $(function(){
+        
         $('#startDate').datetimepicker({
                 format: 'DD-MM-YYYY',
         });
@@ -610,7 +710,6 @@
             }
         });
 
-
         $("#collectionDay").ionRangeSlider({
             type: "single",
             min: 1,
@@ -641,10 +740,11 @@
                 var remainder = timeDifferenceInDays % 30;
                 var t = document.getElementById('rentamt');
                 var totalPayment = quotient * t.value;
+                var rentPerMonth = Math.floor(totalPayment/quotient);
                 console.log(totalPayment + "total amount");
                 console.log(t.value + "total rentamt");
                 //alert("The tenant will have "+quotient+" paying months with "+remainder+" days to spare");
-                $('#aRPMt').val(totalPayment);                
+                $('#aRPMt').val(rentPerMonth);                
                 $('#totalMonth').val(quotient);
                 $('#totalMRent').val(totalPayment);
                 $('#totalDays').val(remainder);
@@ -659,6 +759,36 @@
 
     })
 </script>
+<?php
+    if($_SESSION['tsuccess'] == 'success'){
+        ?>
+        <script type="text/javascript">
+        swal({
+                title: "All done!",
+                text: "Tenant added successfully",
+                type: "success",
+                confirmButtonClass: "btn-success",
+                confirmButtonText: "Success"
+            });
+    </script>
+    <?php
+    }
+    if($_SESSION['tsuccess'] == 'fail'){
+        ?>
+        <script type="text/javascript">
+        swal({ 
+                title: "Error",
+                text: "Server Problem, try again later.",
+                type: "error" 
+                //},
+                  //  function(){
+                  //  window.location.href = 'login.html';
+            });
+    </script>
+        <?php
+    }
+    $_SESSION['tsuccess'] = 'undefined';
+?>
 <div class="main-backdrop"><!-- --></div>
 
 </body>

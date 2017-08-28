@@ -1,4 +1,5 @@
 <?php
+//issue, a user can redirect here if placed in url since session is still ongoing
     include('../controllers/config.php');
     include('../controllers/session.php');
     include('head.php'); 
@@ -14,19 +15,8 @@
     </div>
     <div class="left-menu-inner scroll-pane">
         <ul class="left-menu-list left-menu-list-root list-unstyled">
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-success"></span> All Good 
-                </div>
-            </li>
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-danger"></span> Sumting Wong
-                </div>
-            </li>
-            <li class="left-menu-list-separator "><!-- --></li>
             <li class="left-menu-list-active">
-                <a class="left-menu-link" href="index.php">
+                <a class="left-menu-link" href="admin.php">
                     <i class="left-menu-link-icon icmn-home2"><!-- --></i>
                     <span class="menu-top-hidden">Dashboard</span>
                 </a>
@@ -34,29 +24,18 @@
                 <li class="left-menu-list-separator"><!-- -->
             </li>
             <li>
-                <a class="left-menu-link" href="floors.php">
+                <a class="left-menu-link" href="afloors.php">
                     <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
                     Floors
                 </a>
             </li>
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
-                    <i class="left-menu-link-icon icmn-files-empty2"><!-- --></i>
-                    Unit Information
+            <li>
+                <a class="left-menu-link" href="aunits.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
+                    Units
                 </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="unitsummary.php">
-                           Unit List
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="unitadd.php">
-                            Add Unit
-                        </a>
-                    </li>
-                </ul>
             </li>
+
             <li class="left-menu-list-separator"><!-- --></li>
             <li class="left-menu-list-submenu">
                 <a class="left-menu-link" href="javascript: void(0);">
@@ -174,13 +153,18 @@
 <div class="page-content-inner">
 
     <!-- Dashboard -->
+    <div class="row">
+        <div class="col-md-12">
+        <button id="startrefresh" type="submit" class="btn btn-warning" action="startbilling.php">LOAD BILLING - TEST</button>
+        </div>
+    </div>
     <div class="dashboard-container">
         <div class="row">
             <div class="col-xl-3 col-lg-6 col-sm-6 col-xs-12">
                 <div class="widget widget-seven background-success">
                     <div class="widget-body">
                         <div href="javascript: void(0);" class="widget-body-inner">
-                            <h5 class="text-uppercase">Floors</h5>
+                            <h5 class="text-uppercase">Owners</h5>
                             <i class="counter-icon icmn-office"></i>
                             <span class="counter-count">
                             
@@ -188,9 +172,8 @@
                                 <?php
                                     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
                                     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                    $sql = "SELECT COUNT(*) FROM _floor WHERE _floor.oid = :user";
+                                    $sql = "SELECT COUNT(*) FROM _owner";
                                     $stmt = $conn->prepare($sql);
-                                    $stmt->bindParam(':user', $_SESSION['id']);
                                     $stmt->execute();
                                     $number_of_rows = $stmt->fetchColumn();
                                     echo '<span class="counter-init" data-from="3" data-to="'.$number_of_rows.'"></span>';
@@ -211,10 +194,8 @@
                                 <?php
                                     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
                                     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                    $sql = "SELECT COUNT(*) FROM _unit WHERE userName = :user";
-                                    $sql = "SELECT COUNT(*) FROM _floor INNER JOIN _owner ON _owner.id = _floor.oid INNER JOIN _unit ON _floor.id = _unit.floor_id WHERE _floor.oid = :owner";
+                                    $sql = "SELECT COUNT(*) FROM _unit";
                                     $stmt = $conn->prepare($sql);
-                                    $stmt->bindParam(':owner', $_SESSION['id']);
                                     $stmt->execute();
                                     $number_of_rows = $stmt->fetchColumn();
                                     echo '<span class="counter-init" data-from="0" data-to="'.$number_of_rows.'"></span>';
@@ -228,16 +209,13 @@
                 <div class="widget widget-seven">
                     <div class="widget-body">
                         <div href="javascript: void(0);" class="widget-body-inner">
-                            <h5 class="text-uppercase">Active Tenants</h5>
+                            <h5 class="text-uppercase">Tenants</h5>
                             <i class="counter-icon icmn-users"></i>
                             <span class="counter-count">
                                 <i class="icmn-arrow-up5"></i>
                                 <?php
-                                    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
-                                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                    $sql = "SELECT COUNT(*) FROM _tenantprofile INNER JOIN _tenantrentinginformation ON _tenantprofile.id = _tenantrentinginformation.tid WHERE _tenantprofile.oid = :id";
+                                    $sql = "SELECT COUNT(*) FROM _tenantprofile";
                                     $stmt = $conn->prepare($sql);
-                                    $stmt->bindParam(':id', $_SESSION['id']);
                                     $stmt->execute();
                                     $number_of_rows = $stmt->fetchColumn();
                                     echo '<span class="counter-init" data-from="0" data-to="'.$number_of_rows.'"></span>';
@@ -258,9 +236,8 @@
                                 <?php
                                     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
                                     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                    $sql = "SELECT SUM(balance) FROM _tenantprofile WHERE oid = :id";
+                                    $sql = "SELECT SUM(balance) FROM _ownerAccount";
                                     $stmt = $conn->prepare($sql);
-                                    $stmt->bindParam(':id', $_SESSION['id']);
                                     $stmt->execute();
                                     $number_of_rows = $stmt->fetchColumn();
                                     echo '<span class="counter-init" data-from="0" data-to="'.$number_of_rows.'"></span>';
@@ -429,9 +406,9 @@
 
 </div>
 
-
 <!-- Page Scripts -->
 <script>
+    
     $(function() {
 
         ///////////////////////////////////////////////////////////
@@ -465,42 +442,7 @@
             });
         }
 
-        ///////////////////////////////////////////////////////////
-        // CALENDAR
-        $('.example-calendar-block').fullCalendar({
-            //aspectRatio: 2,
-            height: 450,
-            header: {
-                left: 'prev, next',
-                center: 'title',
-                right: 'month, agendaWeek, agendaDay'
-            },
-            buttonIcons: {
-                prev: 'none fa fa-arrow-left',
-                next: 'none fa fa-arrow-right',
-                prevYear: 'none fa fa-arrow-left',
-                nextYear: 'none fa fa-arrow-right'
-            },
-            editable: true,
-            eventLimit: true, // allow "more" link when too many events
-            viewRender: function(view, element) {
-                if (!cleanUI.hasTouch) {
-                    $('.fc-scroller').jScrollPane({
-                        autoReinitialise: true,
-                        autoReinitialiseDelay: 100
-                    });
-                }
-            },
-            defaultDate: '2017-07-20',
-            eventClick: function(calEvent, jsEvent, view) {
-                if (!$(this).hasClass('event-clicked')) {
-                    $('.fc-event').removeClass('event-clicked');
-                    $(this).addClass('event-clicked');
-                }
-            }
-        });
 
-        ///////////////////////////////////////////////////////////
         // CAROUSEL WIDGET
         $('.carousel-widget').carousel({
             interval: 4000
@@ -516,56 +458,8 @@
             responsive: true,
             "lengthMenu": [[5, 25, 50, -1], [5, 25, 50, "All"]]
         });
-
-        ///////////////////////////////////////////////////////////
-        // CHART 1
-        new Chartist.Line(".chart-line", {
-            labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            series: [
-                [12, 9, 7, 8, 5],
-                [2, 1, 3.5, 7, 3],
-                [1, 3, 4, 5, 6]
-            ]
-        }, {
-            fullWidth: !0,
-            chartPadding: {
-                right: 40
-            },
-            plugins: [
-                Chartist.plugins.tooltip()
-            ]
-        });
-
-        ///////////////////////////////////////////////////////////
-        // CHART 2
-        var overlappingData = {
-                    labels: ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                    series: [
-                        [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
-                        [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4]
-                    ]
-                },
-                overlappingOptions = {
-                    seriesBarDistance: 10,
-                    plugins: [
-                        Chartist.plugins.tooltip()
-                    ]
-                },
-                overlappingResponsiveOptions = [
-                    ["", {
-                        seriesBarDistance: 5,
-                        axisX: {
-                            labelInterpolationFnc: function(value) {
-                                return value[0]
-                            }
-                        }
-                    }]
-                ];
-
-        new Chartist.Bar(".chart-overlapping-bar", overlappingData, overlappingOptions, overlappingResponsiveOptions);
-
-
     });
+
 </script>
 <!-- End Page Scripts -->
 </section>

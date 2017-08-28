@@ -3,24 +3,39 @@
     include('../controllers/session.php');
 
     //1 is occupied, 0 is available
-
         $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        if(isset($_POST['submit'])){
-            $sql = "INSERT INTO `_units` (rent, unitName, floorName, userName, tenant, status) VALUES (:rent, :unit, :floor, :user, '0', '0')";
-            $stmt=$conn->prepare($sql);
-            $stmt->bindParam(':rent', $rent);
-            $stmt->bindParam(':unit', $unit);
-            $stmt->bindParam(':floor', $floor);
-            $stmt->bindParam(':user', $_SESSION['current_user']);
-
-            $rent = $_POST['rent'];
-            $unit = $_POST['unit'];
-            $floor = $_POST['floor'];
+        if(isset($_POST['unit'])){
+            $sql = "SELECT id FROM _floor WHERE oid = :id AND floorName = :floor";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id', $_SESSION['id']);
+            $stmt->bindParam(':floor', $_POST['floor']);
             $stmt->execute();
-        }
-        
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $fid = $result['id'];
 
+            $sql = "INSERT INTO `_unit` (floor_id, unitName, tenantAllowed, rentPerTenant, totalRent, currentTenant) VALUES (:fid, :unit, :tenantAllowed, :rent, :totalRent, '0')";
+            $stmt=$conn->prepare($sql);
+            $rent = $_POST['rentPerTenant'];
+            $unit = $_POST['unit'];
+            $tenantAllowed = $_POST['tenantAllowed'];
+            $totalRent = $tenantAllowed * $rent;
+
+            $stmt->bindParam(':fid', $fid);
+            $stmt->bindParam(':unit', $_POST['unit']);
+            $stmt->bindParam(':tenantAllowed', $tenantAllowed);
+            $stmt->bindParam(':rent', $rent);
+            $stmt->bindParam(':totalRent', $totalRent);
+
+            if($stmt->execute()){
+                $_SESSION['usuccess'] = 'success';
+            }
+            else{
+                $_SESSION['usuccess'] = 'fail';
+
+            }
+        }
+    
     include('head.php'); 
  ?>
 <body class="mode-default colorful-enabled theme-red">
@@ -203,7 +218,7 @@
                     <div class="margin-bottom-50">
                         <br />
                         <!-- Horizontal Form -->
-                        <form method="POST" name="addUnit" action="unitadd.php">
+                        <form method="POST" name="addUnit" id="addUnit">
                             <div class="form-group row">
                                 <div class="col-md-3">
                                     <label for="l13">Floor</label>
@@ -211,9 +226,9 @@
                                 <div class="col-md-9">
                                     <select class="form-control" id="l13" name="floor">
                                         <?php
-                                            $sql = "SELECT floorName FROM _floors WHERE userName = :user";
+                                            $sql = "SELECT floorName FROM _floor WHERE oid = :id";
                                             $stmt = $conn->prepare($sql);
-                                            $stmt->bindParam(':user', $_SESSION['current_user']);
+                                            $stmt->bindParam(':id', $_SESSION['id']);
                                             $stmt->execute();
                                             while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
                                                 echo '<option value="'.$row['floorName'].'">'.$row['floorName'].'</option>';
@@ -228,7 +243,7 @@
                                     <label class="form-control-label" for="l0">Unit Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Unit Name" id="l0" name="unit">
+                                    <input type="text" class="form-control" placeholder="Unit Name" id="l0" name="unit" data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
 
@@ -237,14 +252,32 @@
                                     <label class="form-control-label" for="l0">Rent Per Month</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Monthly Rent" id="l0", name="rent">
+                                    <input type="text" class="form-control" placeholder="Monthly Rent" id="l0", name="rent" data-validation=[NOTEMPTY]>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="l0">Tenants Allowed</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" placeholder="Number of Tenants" id="l0", name="tenantAllowed" data-validation=[NOTEMPTY]>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="l0">Rent per Tenant</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" placeholder="Rent per Tenant" id="l0", name="rentPerTenant" data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
 
                             <div class="form-actions">
                                 <div class="form-group row">
                                     <div class="col-md-9 col-md-offset-3">
-                                        <button type="submit" class="btn width-150 btn-primary" name="submit">Submit</button>
+                                        <button type="submit" name="submitUnit" class="btn width-150 btn-primary">Submit</button>
                                         <button type="button" class="btn btn-default">Cancel</button>
                                     </div>
                                 </div>
@@ -260,7 +293,59 @@
 
 </div>
 </section>
+<?php
+    if($_SESSION['usuccess'] == 'success'){
+        ?>
+        <script type="text/javascript">
+        swal({
+                title: "All done!",
+                text: "Unit added successfully",
+                type: "success",
+                confirmButtonClass: "btn-success",
+                confirmButtonText: "Success"
+            });
+    </script>
+    <?php
+    }
+    if($_SESSION['usuccess'] == 'fail'){
+        ?>
+        <script type="text/javascript">
+        swal({ 
+                title: "Error",
+                text: "Server Problem, try again later.",
+                type: "error" 
+                //},
+                  //  function(){
+                  //  window.location.href = 'login.html';
+            });
+    </script>
+        <?php
+    }
+    $_SESSION['usuccess'] = 'undefined';
+?>
 
+<script type="text/javascript"> 
+        $('#addUnit').validate({
+            submit: {
+                settings: {
+                    inputContainer: '.form-group',
+                    errorListClass: 'form-control-error',
+                    errorClass: 'has-danger'
+                }
+            }
+        });
+
+        $('#addUnit').validate({
+            submit: {
+                settings: {
+                    inputContainer: '.form-group',
+                    errorListClass: 'form-control-error-list',
+                    errorClass: 'has-danger'
+                }
+            }
+        });
+
+</script>
 <div class="main-backdrop"><!-- --></div>
 
 </body>

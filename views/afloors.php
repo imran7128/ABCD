@@ -40,19 +40,8 @@
     </div>
     <div class="left-menu-inner scroll-pane">
         <ul class="left-menu-list left-menu-list-root list-unstyled">
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-success"></span> All Good 
-                </div>
-            </li>
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-danger"></span> Sumting Wong
-                </div>
-            </li>
-            <li class="left-menu-list-separator "><!-- --></li>
             <li>
-                <a class="left-menu-link" href="index.php">
+                <a class="left-menu-link" href="admin.php">
                     <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
                     Dashboard
                 </a>
@@ -61,29 +50,16 @@
             </li>
             
             <li class="left-menu-list-active">
-                <a class="left-menu-link" href="floors.php">
+                <a class="left-menu-link" href="afloors.php">
                     <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
                     Floors
                 </a>
             </li>
-            
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
-                    <i class="left-menu-link-icon icmn-files-empty2"><!-- --></i>
-                    Unit Information
+            <li>
+                <a class="left-menu-link" href="aunits.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
+                    Units
                 </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="unitsummary.php">
-                           Unit List
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="unitadd.php">
-                            Add Unit
-                        </a>
-                    </li>
-                </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
             <li class="left-menu-list-submenu">
@@ -209,80 +185,51 @@
                     <div class="margin-bottom-10">
                         <h4>Floors</h4>
                         <br />
-                        <!-- Vertical Form -->
-                        <form method="POST" action="floors.php">
-                            <div class="row">
-                                <div class="col-lg-3">
-                                    <div class="form-group">
-                                        <label for="l30">Add Floor</label>
-                                        <input type="text" class="form-control" placeholder="Floor Name" id="floorNo" name="floorNumber">
-                                    </div>
-                                    <div class="alert alert-danger" role="alert">
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        <strong>Warning!</strong> <a href="#" class="alert-link">Floor names cannot be edited once submitted.
-                                    </div>
-                                    <div class="form-actions">
-                                        <div class="col-lg-12">
-                                            <button type="submit" class="btn btn-primary width-100" name="submit">Add</button>
-                                            <button type="button" class="btn btn-default width-100">Cancel</button>
-                                        </div>                    
-                                    </div>
-                                </div>
-                        </form>
                         <form>
-                                <div class="col-lg-9">
+                                <div class="col-lg-12">
                                     <br />
                                         <div class="margin-bottom-50">
                                             <table class="table table-hover nowrap" id="example1" width="100%">
                                                 <thead>
                                                     <tr>
+                                                        <th>Owner</th>
                                                         <th>Floor Number</th>
                                                         <th>Number of Units</th>
                                                         <th>Number of Tenants</th>
-                                                        <th>Delete</th>
                                                     </tr>
                                                 </thead>
                                                 <tfoot>
                                                     <tr>
+                                                        <th>Owner</th>
                                                         <th>Floor Number</th>
                                                         <th>Number of Units</th>
                                                         <th>Number of Tenants</th>
-                                                        <th>Delete</th>
                                                     </tr>
                                                 </tfoot>
                                                 <tbody>
                                                     <?php
-                                                        $sql = "SELECT floorName, id FROM _floor WHERE oid = :id";
+                                                        $sql = "SELECT owner, id FROM _owner"
                                                         $stmt = $conn->prepare($sql);
-                                                        $stmt->bindParam(':id', $_SESSION['id']);
                                                         $stmt->execute();
                                                         while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
 
-                                                            $sql1 = "SELECT COUNT(*) FROM _unit WHERE floor_id = :floor";
+                                                            $sql1 = "SELECT COUNT(*), id FROM _floor WHERE oid = :id";
                                                             $stmt1 = $conn->prepare($sql1);
-                                                            $stmt1->bindParam(':floor', $row['id']);
+                                                            $stmt1->bindParam(':id', $row['id']);
                                                             $stmt1->execute();
                                                             $number_of_rows1 = $stmt1->fetchColumn();
 
-                                                            $sql2="SELECT COUNT(*) FROM _unit INNER JOIN _tenantrentinginformation ON _tenantrentinginformation.uid = _unit.id INNER JOIN _floor ON _unit.floor_id = _floor.id WHERE floor_id = :floor";
+                                                            $sql = "SELECT"
                                                             $stmt2 = $conn->prepare($sql2);
                                                             $stmt2->bindParam(':floor', $row['id']);
+                                                            $stmt2->bindParam(':owner', $row['Owner']);
                                                             $stmt2->execute();
                                                             $number_of_rows2 = $stmt2->fetchColumn();
                                                             echo '<tr>';
+                                                            echo '<td>'.$row['owner'].'</td>';
                                                             echo '<td>'.$row['floorName'].'</td>';
                                                             echo '<td>'.$number_of_rows1.'</td>';
-                                                            echo '<td>'.$number_of_rows2.'</td>';
-                                                            if($number_of_rows1 >'0'){
-                                                                echo '<td>-</td>';
-                                                            }
-                                                            else{
-                                                                echo '<td><button class="btn btn-default margin-inline swal-btn-warning" value="'.$row['id'].'" onclick="launchModal(this.value);">Delete</button></td>';
-                                                            }
-
-                                                            
+                                                            echo '<td>'.$number_of_rows2.'</td>';                                                           
                                                             echo '</tr>';
                                                             ?>
                                                             <?php
@@ -313,75 +260,5 @@
     </section>
 </div>
 </section>
-<script type="text/javascript">
-    var valuetodel;
-    function launchModal(selectedValue){
-        //$('.swal-btn-warning').trigger("click");
-        valuetodel = selectedValue;
-    }
-
-    $('.swal-btn-warning').click(function(e){
-        e.preventDefault();
-            swal({
-                title: "Are you sure?",
-                text: "Your will not be able to recover this file!",
-                type: "warning",
-                showCancelButton: true,
-                cancelButtonClass: "btn-default",
-                confirmButtonClass: "btn-warning",
-                confirmButtonText: "Remove",
-                closeOnConfirm: false
-            },
-            function(){
-                <?php $_SESSION['floor_delete_by_user'] = 'true';?>
-                var uri = "<?php echo $escaped_url;?>";
-                var dest = uri.concat("?fid=",valuetodel);
-                window.location.replace(dest);
-            });
-        });
-
-</script>
-<?php
-    if($_SESSION['usuccess'] == 'success'){
-        ?>
-        <script type="text/javascript">
-        swal({
-                title: "All done!",
-                text: "Floor added successfully",
-                type: "success",
-                confirmButtonClass: "btn-success",
-                confirmButtonText: "Success"
-            });
-    </script>
-    <?php
-    }
-    if($_SESSION['usuccess'] == 'fail'){
-        ?>
-        <script type="text/javascript">
-        swal({ 
-                title: "Error",
-                text: "Server Problem, try again later.",
-                type: "error" 
-                //},
-                  //  function(){
-                  //  window.location.href = 'login.html';
-            });
-    </script>
-        <?php
-    }
-    if($_SESSION['usuccess'] == 'deleted'){
-        ?>
-        <script type="text/javascript">
-            swal({
-                    title: "Deleted!",
-                    text: "File has been deleted",
-                    type: "success",
-                    confirmButtonClass: "btn-success"
-                });           
-        </script><?php
-    }
-
-    $_SESSION['usuccess'] = 'undefined';
-?>
 </body>
 
