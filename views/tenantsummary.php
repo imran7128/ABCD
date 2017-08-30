@@ -1,4 +1,9 @@
 <?php
+//edit yung bill
+    include('../controllers/config.php');
+    include('../controllers/session.php');
+    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     include('head.php'); 
  ?>
 <body class="mode-default colorful-enabled theme-red">
@@ -174,13 +179,13 @@
     <section class="panel">
         <div class="panel-heading">
             <h3>
-                Active Tenants
+                Active Rents
             </h3>
         </div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Summary of Active Tenants</p>
+                    <p>Summary of Active Rents</p>
                     <br />
                     <div class="margin-bottom-50">
                         <table class="table table-hover nowrap" id="tblActive" width="100%">
@@ -205,14 +210,60 @@
                             </tr>
                             </tfoot>
                             <tbody>
-                            <tr>
-                                <td>Damon</td>
-                                <td>5516 Adolfo Green</td>
-                                <td>Littelhaven</td>
-                                <td>85</td>
-                                <td>2014/06/13</td>
-                                <td>$553,536</td>
-                            </tr>
+                            <?php
+                                date_default_timezone_set('Asia/Singapore');
+                                $currentMonth = date('m');
+                                $currentYear = date('Y');
+                                $tenantDay = "";
+                                $sql = "SELECT _tenantprofile.firstName as fName, _tenantprofile.lastName as lName, _tenantrentinginformation.uid as uid, _tenantrentinginformation.adjustedRentPerMonth as rpm, _tenantprofile.balance as balance, _tenantprofile.id as tenantid, _tenantrentinginformation.id as trid FROM _tenantrentinginformation INNER JOIN _tenantprofile ON _tenantrentinginformation.tid = _tenantprofile.id WHERE _tenantprofile.oid = :id";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->bindParam('id', $_SESSION['id']);
+                                $stmt->execute();
+                                while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                                    $sql1 = "SELECT _floor.floorName as floorName, _unit.unitName as unitName FROM _unit INNER JOIN _floor ON _unit.floor_id = _floor.id WHERE _floor.oid = :id AND _unit.id = :unitid";
+                                    $stmt1 = $conn->prepare($sql1);
+                                    $stmt1->bindParam('id', $_SESSION['id']);
+                                    $stmt1->bindParam('unitid', $row['uid']);
+                                    $stmt1->execute();
+                                    $result = $stmt1->fetch(PDO::FETCH_ASSOC);
+
+                                    $sql2 = "SELECT date FROM _bill WHERE tid = :tid AND trid = :trid ORDER BY id ASC";
+                                    $stmt2 = $conn->prepare($sql2);
+                                    $stmt2->bindParam('tid', $row['tenantid']);
+                                    $stmt2->bindParam('trid', $row['trid']);
+                                    $stmt2->execute();
+                                    while($r = $stmt2->fetch(PDO::FETCH_ASSOC)){
+                                        $r = explode("-", $r['date']);
+                                        //dd-mm-yyy
+                                        $tenantDay = $r[0];
+                                        $tenantMonth = $r[1];
+                                        $tenantYear = $r[2];
+                                        break;
+                                    }
+                                    
+                                    $dayRequired = $tenantDay.'-'.$currentMonth.'-'.$currentYear;
+                                    $sql3 = "SELECT SUM(AMOUNT) as amt, COUNT(*) as r FROM _bill WHERE tid = :tid AND trid = :trid AND date = :d";
+                                    $stmt3 = $conn->prepare($sql3);
+                                    $stmt3->bindParam('tid', $row['tenantid']);
+                                    $stmt3->bindParam('trid', $row['trid']);
+                                    $stmt3->bindParam('d', $dayRequired);
+                                    $stmt3->execute();
+                                    $sumrent = $stmt3->fetch(PDO::FETCH_ASSOC);
+                                    if($sumrent['r'] == '0'){
+                                        $sumrent['amt'] = 0;
+                                    }
+
+                                    echo '<tr>';
+                                    echo '<td>'.$row['fName'].' '.$row['lName'].'</td>';
+                                    echo '<td>'.$result['floorName'].'</td>';
+                                    echo '<td>'.$result['unitName'].'</td>';
+                                    echo '<td>'.$row['rpm'].'</td>';
+                                    echo '<td>'.$sumrent['amt'].'</td>';
+                                    echo '<td>'.$row['balance'].'</td>';
+                                    echo '</tr>';
+
+                                }
+                            ?>
                             </tbody>
                         </table>
                     </div>
@@ -249,11 +300,20 @@
                             </tr>
                             </tfoot>
                             <tbody>
-                            <tr>
-                                <td>Damon</td>
-                                <td>0</td>
-                                <td>Button to Rent Again</td>
-                            </tr>
+                            <?php
+                                $sql = "SELECT firstName, lastName, balance, id FROM _tenantprofile WHERE id NOT IN (SELECT tid FROM _tenantrentinginformation) AND oid = :id";
+                                $stmt =  $conn->prepare($sql);
+                                $stmt->bindParam('id', $_SESSION['id']);
+                                $stmt->execute();
+                                while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                                    echo '<tr>';
+                                    echo '<td>'.$row['firstName'].' '.$row['lastName'].'</td>';
+                                    echo '<td>'.$row['balance'].'</td>';
+                                    echo '<td><a class="icmn icmn-home6" href="tenantadd.php?tid='.htmlspecialchars($row['id']).'"</td>';
+                                    echo '</tr>';
+                                }
+
+                            ?>
                             </tbody>
                         </table>
                     </div>

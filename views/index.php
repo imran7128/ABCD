@@ -1,8 +1,11 @@
 <?php
     include('../controllers/config.php');
     include('../controllers/session.php');
+    include('../controllers/billstatuschecker.php');
     include('head.php'); 
     //session_start();
+    //call billstatuschecker
+
 ?>
 <body class="mode-default colorful-enabled theme-red">
 <nav class="left-menu" left-menu>
@@ -75,28 +78,13 @@
                     </li>
                 </ul>
             </li>
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
+            <li>
+                <a class="left-menu-link" href="bill.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
                     Billing
                 </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Edit
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Payments Summary
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Current Collection
-                        </a>
-                    </li>                    
-                </ul>
             </li>
+            
             <li class="left-menu-list-submenu">
                 <a class="left-menu-link" href="javascript: void(0);">
                     Notices
@@ -120,18 +108,6 @@
                 <a class="left-menu-link" href="apps-profile.html">
                     <i class="left-menu-link-icon icmn-profile"><!-- --></i>
                     Current Profile
-                </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-messaging.html">
-                    <i class="left-menu-link-icon icmn-bubbles5"><!-- --></i>
-                    Messaging
-                </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-calendar.html">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Calendar
                 </a>
             </li>
             <li>
@@ -175,6 +151,17 @@
 
     <!-- Dashboard -->
     <div class="dashboard-container">
+    <!--
+        <div class="row">
+        <form method="POST" name="statuschecker" id="statuschecker">
+            <div class="text-center">
+                    <button type="submit" class="btn btn-success-outline" name="submit"">
+                        Check Bill - admin
+                    </button>
+            </div>
+        </form>
+        </div>
+    -->
         <div class="row">
             <div class="col-xl-3 col-lg-6 col-sm-6 col-xs-12">
                 <div class="widget widget-seven background-success">

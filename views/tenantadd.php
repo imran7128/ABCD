@@ -14,7 +14,52 @@
     include('../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    if(isset($_GET['fid'])){
+    $firstName = "";
+    $lastName = "";
+    $userName = "";
+    $password = "";
+    $address= "";
+    $email= "";
+    $contactNumber= "";
+    $guardianName= "";
+    $guardianAddress= "";
+    $guardianContact= "";
+    $owner= $_SESSION['current_user'];
+    $floorName = "";
+    $unitName = "";
+    $startDate = "";
+    $endDate = "";
+    if(isset($_GET['tid'])){
+        $sql = "SELECT
+            _tenantprofile.firstName as fName,
+            _tenantprofile.lastName as lName,
+            _tenantprofile.address as address,
+            _tenantprofile.email as email,
+            _tenantprofile.contactNumber as contact,
+            _tenantprofile.guardianName as gName,
+            _tenantprofile.guardianAddress as gAddress,
+            _tenantprofile.guardianContact as gContact,
+            _tenantprofile.username as username,
+            _tenantprofile.password as password
+            FROM
+            _tenantprofile WHERE _tenantprofile.oid = :id AND _tenantprofile.id = :tid";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id', $_SESSION['id']);
+            $stmt->bindParam(':tid', $_GET['tid']);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $firstName = $result['fName'];
+            $lastName = $result['lName'];
+            $address = $result['address'];
+            $contactNumber = $result['contact'];
+            $guardianName = $result['gName'];
+            $guardianAddress = $result['gAddress'];
+            $guardianContact = $result['gContact'];
+            $email = $result['email'];
+            $username = $result['username'];
+            $password = $result['password'];
+            echo '<script>alert('.$username.');</script>';
+
 
     }
     if(isset($_POST['firstName'])){
@@ -27,8 +72,12 @@
 
         $firstName= $_POST['firstName'];
         $lastName= $_POST['lastName'];
-        $userName = $firstName.$_SESSION['id'];
-        $password = $lastName.$_SESSION['id'];
+
+        if(!isset($_GET['tid'])){
+            $userName = $firstName.$_SESSION['id'];
+            $password = $lastName.$_SESSION['id'];
+        }
+        
         $address= $_POST['address'];
         $email= $_POST['email'];
         $contactNumber= $_POST['contactNumber'];
@@ -41,28 +90,46 @@
         $startDate = $_POST['startDate'];
         $endDate = $_POST['endDate'];
         $collectionDay = $_POST['collectionDay'];
-        $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, username, password, address, email, contactNumber, guardianName, guardianAddress, guardianContact, oid, balance) VALUES (:firstName, :lastName, :username, :password, :address, :email, :contactNumber, :guardianName, :guardianAddress, :guardianContact, :oid, :balance)";
-        $stmt = $conn->prepare($sql);
+
+        if(isset($_GET['tid'])){
+            $sql = "SELECT balance from _tenantprofile WHERE id = :tid";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam('tid', $_GET['tid']);
+            $stmt->execute();
+            $brow = $stmt->fetch(PDO::FETCH_ASSOC);
+            $b = $brow['balance'];
+            $b += $balance;
+
+            $sql = "UPDATE _tenantprofile SET firstName = :firstName, lastName = :lastName, address = :address, email = :email, contactNumber = :contactNumber, guardianName = :guardianName, guardianAddress = :guardianAddress, guardianContact = :guardianContact, balance = :balance WHERE id = :id";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam('id', $_GET['tid']);
+            $stmt->bindParam('balance', $b); 
+        }
+        else{
+            $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, username, password, address, email, contactNumber, guardianName, guardianAddress, guardianContact, oid, balance) VALUES (:firstName, :lastName, :username, :password, :address, :email, :contactNumber, :guardianName, :guardianAddress, :guardianContact, :oid, :balance)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam('username',$userName);
+            $stmt->bindParam('password',$password);
+            $stmt->bindParam('oid',$_SESSION['id']); 
+            $stmt->bindParam('balance',$balance);
+
+        }
         $stmt->bindParam('firstName',$firstName);
         $stmt->bindParam('lastName',$lastName);
-        $stmt->bindParam('username',$userName);
-        $stmt->bindParam('password',$password);
         $stmt->bindParam('address',$address);
         $stmt->bindParam('email',$email);
         $stmt->bindParam('contactNumber',$contactNumber);
         $stmt->bindParam('guardianName',$guardianName);
         $stmt->bindParam('guardianAddress',$guardianAddress);
-        $stmt->bindParam('guardianContact',$guardianContact);
-        $stmt->bindParam('oid',$_SESSION['id']);
-        $stmt->bindParam('balance',$balance);
+        $stmt->bindParam('guardianContact',$guardianContact);  
         $stmt->execute();
 
-        $sql = "SELECT id FROM `_tenantprofile` WHERE username = :username AND password = :password";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':username', $userName);
-        $stmt->bindParam(':password', $password);
-        $stmt->execute();
-        $tenantid=$stmt->fetch(PDO::FETCH_ASSOC);
+        $sql3 = "SELECT id FROM `_tenantprofile` WHERE userName = :username AND password = :password";
+        $stmt3 = $conn->prepare($sql3);
+        $stmt3->bindParam(':username', $userName);
+        $stmt3->bindParam(':password', $password);
+        $stmt3->execute();
+        $tenantid=$stmt3->fetch(PDO::FETCH_ASSOC);
 
         $sql = "SELECT _unit.id FROM _unit INNER JOIN _floor ON _unit.floor_id = _floor.id WHERE _floor.oid = :id AND _unit.unitName = :unit";
         $stmt = $conn->prepare($sql);
@@ -82,8 +149,14 @@
         $stmt->bindParam(':collectionDay',$collectionDay);
         $stmt->bindParam(':balance',$balance);
         $stmt->bindParam(':adjustedRentPerMonth',$adjustedRentPerMonth);
-        $stmt->bindParam('tid', $tenantid['id']);
-        $stmt->bindParam('uid', $unitid['id']);
+        if(isset($_GET['tid'])){
+            $stmt->bindParam(':tid', $_GET['tid']);
+        }
+        else{
+            $stmt->bindParam(':tid', $tenantid['id']);
+        }
+        
+        $stmt->bindParam(':uid', $unitid['id']);
         $stmt->execute();
 
         $sql = "UPDATE `_unit` SET currentTenant = currentTenant + :add WHERE id = :uid";
@@ -107,7 +180,12 @@
 
         $sql = "SELECT id FROM _tenantrentinginformation WHERE tid = :tid";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam('tid', $tenantid['id']);
+        if(isset($_GET['tid'])){
+            $stmt->bindParam(':tid', $_GET['tid']);
+        }
+        else{
+            $stmt->bindParam(':tid', $tenantid['id']);
+        }
         $stmt->execute();   
         $description = 'Monthly Bill';    
         $trids = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -136,9 +214,14 @@
                                 sleep(0.5);
                             
                                 $totalMonths -= 1;
-                                $sql = "INSERT INTO _bill (tid, trid, description, amount, date) VALUES (:tid, :trid, :description,:amount, :day)";
+                                $sql = "INSERT INTO _bill (tid, trid, description, amount, date, status) VALUES (:tid, :trid, :description,:amount, :day, 'pending')";
                                 $stmt = $conn->prepare($sql);
-                                $stmt->bindParam(':tid', $tenantid['id']);
+                                if(isset($_GET['tid'])){
+                                    $stmt->bindParam(':tid', $_GET['tid']);
+                                }
+                                else{
+                                    $stmt->bindParam(':tid', $tenantid['id']);
+                                }
                                 $stmt->bindParam(':trid', $trid['id']);
                                 $stmt->bindParam(':day', $fday);
                                 $stmt->bindParam(':amount', $adjustedRentPerMonth);
@@ -346,7 +429,7 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control" placeholder="First Name" id="l0" name="firstName"
-                                    data-validation=[NOTEMPTY]>
+                                    data-validation=[NOTEMPTY] value="<?php echo $firstName;?>">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -355,7 +438,7 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control" placeholder="Last Name" id="l0" name="lastName"
-                                    data-validation=[NOTEMPTY]>
+                                    data-validation=[NOTEMPTY] value="<?php echo $lastName;?>">
                                 </div>
                             </div>
 
@@ -365,7 +448,7 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control" placeholder="Permanent Address" id="l0" name="address"
-                                    data-validation=[NOTEMPTY]>
+                                    data-validation=[NOTEMPTY] value="<?php echo $address;?>">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -378,7 +461,7 @@
                                             <i class="icmn-mail2"></i>
                                         </span>
                                         <input type="email" class="form-control" placeholder="Email Address" id="l2" name="email"
-                                        data-validation=[EMAIL]>
+                                        data-validation=[EMAIL] value="<?php echo $email;?>">
                                     </div>
                                 </div>
                             </div>
@@ -388,7 +471,7 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control" placeholder="Cellphone Number" id="l0" name="contactNumber"
-                                    data-validation=[NOTEMPTY]>
+                                    data-validation=[NOTEMPTY] value="<?php echo $contactNumber;?>">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -397,7 +480,7 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control" placeholder="Parent/Guardian Name" id="l0" name="guardianName"
-                                    data-validation=[NOTEMPTY]>
+                                    data-validation=[NOTEMPTY] value="<?php echo $guardianName;?>">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -406,7 +489,7 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control" placeholder="Parent/Guardian Address" id="l0" name="guardianAddress" 
-                                    data-validation=[NOTEMPTY]>
+                                    data-validation=[NOTEMPTY] value="<?php echo $guardianAddress;?>">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -415,7 +498,7 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control" placeholder="Parent/Guardian Contact No." id="l0" name="guardianContact"
-                                    data-validation=[NOTEMPTY]>
+                                    data-validation=[NOTEMPTY] value="<?php echo $guardianContact;?>">
                                 </div>
                             </div>
 
@@ -769,6 +852,8 @@
                 type: "success",
                 confirmButtonClass: "btn-success",
                 confirmButtonText: "Success"
+            },function(){
+                window.location.replace("tenantadd.php");
             });
     </script>
     <?php
@@ -788,6 +873,7 @@
         <?php
     }
     $_SESSION['tsuccess'] = 'undefined';
+    
 ?>
 <div class="main-backdrop"><!-- --></div>
 
