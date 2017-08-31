@@ -183,7 +183,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                     <label>Unit Name</label>
-                    <select class="select2" name="unitOption" id="unitOption" onchange="changetenant(this.value);">
+                    <select class="select2" name="unitOption" id="unitOption" onclick="changeOption(this.value);">
                     <?php
                         $sql = "SELECT _unit.unitName as unitName, _unit.id as uid FROM _unit INNER JOIN _floor ON _unit.floor_id = _floor.id WHERE _floor.oid = :id";
                         $stmt = $conn->prepare($sql);
@@ -209,8 +209,8 @@
                 <div class="row">
                     <div class="text-center">
                     <input type="hidden" value="all" name="all" id="all">
-                        <button type="button" class="btn btn-success-outline" name="current" onclick="setCurrent();">
-                        Current
+                        <button type="button" class="btn btn-success-outline" name="current" id="current" onclick="setCurrent();">
+                        Latest
                         </button>
                         <button type="button" class="btn btn-success-outline" name="unpaid" onclick="setUnpaid();">
                         Unpaid
@@ -232,21 +232,163 @@
     <section name="invoiceResult" id="invoiceResult">
         
     </section>
+    <div class="modal fade" id="additem" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">Add Item</h4>
+                            </div>
+                            <div class="modal-body">
+                            <div class="row">
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" placeholder="Description" id="description" data-validation="[NOTETMPTY]">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" placeholder="Amount" id="amount" data-validation="[NOTETMPTY]">
+                            </div>
+                            </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="submit">Add</button>
+                            </div>
+                        </div>
+                    </div>
+    </div>
+
+    <div class="modal fade" id="pay" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">Payment Amount</h4>
+                            </div>
+                            <div class="modal-body">
+                            <div class="row">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" placeholder="Enter Amount" id="paymentamount" data-validation="[NOTETMPTY]">
+                            </div>
+                            </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" id="okpay">Okay</button>
+                            </div>
+                        </div>
+                    </div>
+    </div>
 
 </div>
 </section>
+<script type="text/javascript">
+    function showmodal(){
+        $('#additem').modal('show');
+    }
+    function showmodal2(){
+        $('#pay').modal('show');
+    }
+    function deleteval(value){
+        $.ajax
+    ({
+        url: "../controllers/deleteval.php",
+        type:'POST',
+        data:
+        {
+            id: value
+        },
+        success: function(result)
+        {   
+            current.click();
+        }               
+    });
+}
+    function changepaid(value){
+        $.ajax
+    ({
+        url: "../controllers/markpaid.php",
+        type:'POST',
+        data:
+        {
+            id: value
+        },
+        success: function(result)
+        {   
+            current.click();
+        }               
+    });
+    }
+</script>
 <script>
     $(function(){
 
         $('.select2').select2();
+        
+        $('.select2').select2().on("select2:close", function(e) {
+          changetenant(this.value);
+        })
         $('.select3').select2();
 
-    })
+    });
+</script>
+<script type="text/javascript">
+    $('#submit').click(function(){
+        var desc = document.getElementById("description").value;
+        var amt = document.getElementById("amount").value;
+        var currentButton = document.getElementById("current");
+        if(desc != "" && amt != ""){
+    $.ajax
+    ({
+        url: "../controllers/updateinvoice.php",
+        type:'POST',
+        data:
+        {
+            d: desc,
+            a: amt 
+        },
+        success: function(result)
+        {   
+            $('#additem').modal('hide');
+            current.click();
+        }               
+    });
+}//if statement
+});
+        $('#okpay').click(function(){
+        var tid = document.getElementById("tenantOption").value;
+        var amt = document.getElementById("paymentamount").value;
+        var desc = "";
+        var currentButton = document.getElementById("current");
+        if(amt != ""){
+    $.ajax
+    ({
+        url: "../controllers/payment.php",
+        type:'POST',
+        data:
+        {
+            tid: tid,
+            amount: amt,
+            description: desc 
+        },
+        success: function(result)
+        {   
+            alert(result);
+            $('#pay').modal('hide');
+            changepaid("1");
+            current.click();
+        }               
+    });
+}//if statement
+});
 </script>
 
 <script type="text/javascript">
     function changetenant(selectedValue) {
-    var selbox = document.main.tenantOption;
+    var selbox = document.main.unitOption;
     var dataString = selectedValue;
     $.ajax
         ({

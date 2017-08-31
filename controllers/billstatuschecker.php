@@ -21,6 +21,7 @@
 	$stat = "";
 	//anything from here onward is pending
 	//anything from before today is unpaid
+	//loser pwede pala yung datetime_diff lol ayusin mo soon
 	while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
 		$compare = explode("-", $result['date']);
 		if($currentY > $compare[2]){

@@ -30,16 +30,27 @@
 
     if(isset($_POST['current'])){
     	$billid = "";
-    	$sql = "SELECT id, date FROM _bill WHERE trid ='".$trid."' AND status = 'pending' ORDER BY id ASC";
+        $d  = "";
+    	$sql = "SELECT id, date, amount FROM _bill WHERE trid ='".$trid."' AND status = 'pending' ORDER BY id ASC";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         while($br =$stmt->fetch(PDO::FETCH_ASSOC)){
+            $d = explode("-", $br['date']);
+            $monthNum  = $d[1];
+            $dateObj   = DateTime::createFromFormat('!m', $monthNum);
+            $monthName = $dateObj->format('F'); 
+            $selectedDate  = explode("-", $br['date']);
+            $selectedDate = strtotime($selectedDate[1].'/'.$selectedDate[0].'/'.$selectedDate[2]);
         	$billid = $br['id'];
+            $_SESSION['current_bill_id'] = $billid;
+            $d = explode('-',$br['date']);
+            $date = date_create($d[2].'-'.$d[1].'-'.$d[0]);
+            date_sub($date, date_interval_create_from_date_string('7 days'));
         	
     	echo '<!-- Pricing Tables -->
     <div class="panel">
         <div class="panel-heading">
-            <h3>Invoice</h3>
+            <h3>Invoice for '.$monthName.'</h3>
         </div>
         <div class="panel-body">
             <div class="margin-bottom-50">
@@ -75,9 +86,9 @@
                             <abbr title="Phone">Phone:</abbr>&nbsp;&nbsp;'.$contact.'
                             <br />
                         </address>
-                        <span>Invoice Date: </span>
+                        <span>Invoice Date: '.date_format($date, 'd-m-Y').'</span>
                         <br />
-                        <span>Due Date: </span>
+                        <span>Due Date: '.$br['date'].'</span>
                         <br />
                         <br />
                     </div>
@@ -86,35 +97,51 @@
                         <table class="table table-hover text-right">
                             <thead>
                             <tr>
-                                <th class="text-center">#</th>
+                                <th width = "20"> <a class="icmn icmn-plus" onclick="showmodal();"></th>
                                 <th>Description</th>
                                 <th class="text-right">Amount</th>
-                                <th class="text-right">Total</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             <tr>
-                                <td class="text-center">1</td>
+                                <td></td>
                                 <td class="text-left">Monthly Rent</td>
-                                <td>Php 75.00</td>
-                                <td>Php 2,152.00</td>
-                            </tr>
-                            </tbody>
+                                <td>Php '.$br['amount'].'</td>
+                            </tr>';
+                            $sql = "SELECT amount, description, id FROM _bill_items WHERE bid = '".$br['id']."'";
+                            $stmt = $conn->prepare($sql);
+                            $stmt->execute();
+                            while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+                                echo '<tr>';
+                                echo '<td><a class="icmn icmn-minus" onclick="deleteval('.$result['id'].')"></td>';
+                                echo '<td class="text-left">'.$result['description'].'</td>';
+                                echo '<td>'.$result['amount'].'</td>';
+                                echo '</tr>';
+                            }
+
+                            echo '</tbody>
                         </table>
                     </div>
                     <div class="text-right clearfix">
                         <div class="pull-right">
-                            <p class="page-invoice-amount">
-                                <strong>Total: <span>Php</span></strong>
+                            <p class="page-invoice-amount">';
+                                $sql = "SELECT SUM(amount) as subtotal FROM _bill_items WHERE bid = '".$br['id']."'";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->execute();
+                                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $r =  doubleval($result['subtotal']);
+                                $brtotal = doubleval($br['amount']);
+                                $total = $r + $brtotal;
+                            echo '<strong>Total: <span>Php '.$total.'</span></strong>
                             </p>
                             <br />
                         </div>
                     </div>
                     <div class="text-right">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary" onclick="showmodal2();">
                             <i class="icmn-checkmark margin-right-5"></i>
-                            Proceed to payment
+                            Mark as paid
                         </button>
                         <button type="button" class="btn btn-default" onclick="javascript:window.print();">
                             <i class="icmn-printer margin-right-5"></i>
@@ -130,11 +157,14 @@
     }//end of current
 
     if(isset($_POST['pending'])){
-    	$sql ="SELECT id FROM _bill WHERE trid = :trid AND status = 'pending' ORDER BY id ASC";
+    	$sql ="SELECT id, date FROM _bill WHERE trid = :trid AND status = 'pending' ORDER BY id ASC";
     	$stmt =$conn->prepare($sql);
     	$stmt->bindParam(':trid', $trid);
     	$stmt->execute();
-    	while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+    	while($br = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $d = explode('-',$br['date']);
+            $date = date_create($d[2].'-'.$d[1].'-'.$d[0]);
+            date_sub($date, date_interval_create_from_date_string('7 days'));
     		echo '<!-- Pricing Tables -->
     <div class="panel">
         <div class="panel-heading">
@@ -174,9 +204,9 @@
                             <abbr title="Phone">Phone:</abbr>&nbsp;&nbsp;'.$contact.'
                             <br />
                         </address>
-                        <span>Invoice Date: </span>
+                        <span>Invoice Date: '.date_format($date, 'd-m-Y').'</span>
                         <br />
-                        <span>Due Date: </span>
+                        <span>Due Date: '.$br['date'].'</span>
                         <br />
                         <br />
                     </div>
@@ -227,11 +257,14 @@
 		}//end of while
     }//end of pending
     if(isset($_POST['paid'])){
-    	$sql ="SELECT id FROM _bill WHERE trid = :trid AND status = 'paid' ORDER BY id ASC";
+    	$sql ="SELECT id, date FROM _bill WHERE trid = :trid AND status = 'paid' ORDER BY id ASC";
     	$stmt =$conn->prepare($sql);
     	$stmt->bindParam(':trid', $trid);
     	$stmt->execute();
-    	while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+    	while($br = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $d = explode('-',$br['date']);
+            $date = date_create($d[2].'-'.$d[1].'-'.$d[0]);
+            date_sub($date, date_interval_create_from_date_string('7 days'));
     		echo '<!-- Pricing Tables -->
     <div class="panel">
         <div class="panel-heading">
@@ -271,9 +304,9 @@
                             <abbr title="Phone">Phone:</abbr>&nbsp;&nbsp;'.$contact.'
                             <br />
                         </address>
-                        <span>Invoice Date: </span>
+                        <span>Invoice Date: '.date_format($date, 'd-m-Y').'</span>
                         <br />
-                        <span>Due Date: </span>
+                        <span>Due Date: '.$br['date'].'</span>
                         <br />
                         <br />
                     </div>
@@ -324,11 +357,14 @@
 		}//end of while
     }//end of paid
     if(isset($_POST['unpaid'])){
-    	$sql ="SELECT id FROM _bill WHERE trid = :trid AND status = 'unpaid' ORDER BY id ASC";
+    	$sql ="SELECT id,date FROM _bill WHERE trid = :trid AND status = 'unpaid' ORDER BY id ASC";
     	$stmt =$conn->prepare($sql);
     	$stmt->bindParam(':trid', $trid);
     	$stmt->execute();
-    	while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+    	while($br = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $d = explode('-',$br['date']);
+            $date = date_create($d[2].'-'.$d[1].'-'.$d[0]);
+            date_sub($date, date_interval_create_from_date_string('7 days'));
     		echo '<!-- Pricing Tables -->
     <div class="panel">
         <div class="panel-heading">
@@ -368,9 +404,9 @@
                             <abbr title="Phone">Phone:</abbr>&nbsp;&nbsp;'.$contact.'
                             <br />
                         </address>
-                        <span>Invoice Date: </span>
+                        <span>Invoice Date: '.date_format($date, 'd-m-Y').'</span>
                         <br />
-                        <span>Due Date: </span>
+                        <span>Due Date: '.$br['date'].'</span>
                         <br />
                         <br />
                     </div>
@@ -421,11 +457,14 @@
 		}//end of while
     }//end of unpaid
     if(isset($_POST['all'])){
-    	$sql ="SELECT id FROM _bill WHERE trid = :trid ORDER BY id ASC";
+    	$sql ="SELECT id,date FROM _bill WHERE trid = :trid ORDER BY id ASC";
     	$stmt = $conn->prepare($sql);
     	$stmt->bindParam(':trid', $trid);
     	$stmt->execute();
-    	while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+    	while($br = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $d = explode('-',$br['date']);
+            $date = date_create($d[2].'-'.$d[1].'-'.$d[0]);
+            date_sub($date, date_interval_create_from_date_string('7 days'));
     		echo '<!-- Pricing Tables -->
     <div class="panel">
         <div class="panel-heading">
@@ -465,9 +504,9 @@
                             <abbr title="Phone">Phone:</abbr>&nbsp;&nbsp;'.$contact.'
                             <br />
                         </address>
-                        <span>Invoice Date: </span>
+                        <span>Invoice Date: '.date_format($date, 'd-m-Y').'</span>
                         <br />
-                        <span>Due Date: </span>
+                        <span>Due Date: '.$br['date'].'</span>
                         <br />
                         <br />
                     </div>

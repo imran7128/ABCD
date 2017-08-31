@@ -29,6 +29,7 @@
     $unitName = "";
     $startDate = "";
     $endDate = "";
+
     if(isset($_GET['tid'])){
         $sql = "SELECT
             _tenantprofile.firstName as fName,
@@ -58,10 +59,8 @@
             $email = $result['email'];
             $username = $result['username'];
             $password = $result['password'];
-            echo '<script>alert('.$username.');</script>';
-
-
     }
+
     if(isset($_POST['firstName'])){
         $totalMonths = $_POST['totalMonth'];
         $balance = $_POST['totalMRent'];
@@ -131,7 +130,7 @@
         $stmt3->execute();
         $tenantid=$stmt3->fetch(PDO::FETCH_ASSOC);
 
-        $sql = "SELECT _unit.id FROM _unit INNER JOIN _floor ON _unit.floor_id = _floor.id WHERE _floor.oid = :id AND _unit.unitName = :unit";
+        $sql = "SELECT _unit.id as id FROM _unit INNER JOIN _floor ON _unit.floor_id = _floor.id WHERE _floor.oid = :id AND _unit.id = :unit";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':id', $_SESSION['id']);
         $stmt->bindParam(':unit', $unitName);
@@ -155,7 +154,6 @@
         else{
             $stmt->bindParam(':tid', $tenantid['id']);
         }
-        
         $stmt->bindParam(':uid', $unitid['id']);
         $stmt->execute();
 
@@ -201,7 +199,7 @@
                             }
                             $fday = $collectionDay."-".$month."-".$year;
                         }
-                        if($collectionDay < $day){
+                        if($collectionDay <= $day){
                             if($month == 12){
                                 $month = 1;
                                 $year += 1;    
