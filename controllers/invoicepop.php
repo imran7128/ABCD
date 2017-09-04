@@ -5,6 +5,7 @@
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $trid = $_POST['trid'];
     $uid = $_POST['uid'];
+    $_POST['balancetotal'] = "";
 
     if($_POST['trid'] && $_POST['uid']){
         $sql = "SELECT
@@ -29,21 +30,22 @@
     
 
     if(isset($_POST['current'])){
+        $total = 0;
     	$billid = "";
         $d  = "";
-    	$sql = "SELECT id, date, amount FROM _bill WHERE trid ='".$trid."' AND status = 'pending' ORDER BY id ASC";
+    	$sql = "SELECT tid, id, date, amount, status FROM _bill WHERE trid ='".$trid."' AND status = 'pending' ORDER BY id ASC";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
-        while($br =$stmt->fetch(PDO::FETCH_ASSOC)){
-            $d = explode("-", $br['date']);
+        while($bro = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $d = explode("-", $bro['date']);
             $monthNum  = $d[1];
             $dateObj   = DateTime::createFromFormat('!m', $monthNum);
             $monthName = $dateObj->format('F'); 
-            $selectedDate  = explode("-", $br['date']);
+            $selectedDate  = explode("-", $bro['date']);
             $selectedDate = strtotime($selectedDate[1].'/'.$selectedDate[0].'/'.$selectedDate[2]);
-        	$billid = $br['id'];
+        	$billid = $bro['id'];
             $_SESSION['current_bill_id'] = $billid;
-            $d = explode('-',$br['date']);
+            $d = explode('-',$bro['date']);
             $date = date_create($d[2].'-'.$d[1].'-'.$d[0]);
             date_sub($date, date_interval_create_from_date_string('7 days'));
         	
@@ -88,7 +90,7 @@
                         </address>
                         <span>Invoice Date: '.date_format($date, 'd-m-Y').'</span>
                         <br />
-                        <span>Due Date: '.$br['date'].'</span>
+                        <span>Due Date: '.$bro['date'].'</span>
                         <br />
                         <br />
                     </div>
@@ -102,23 +104,106 @@
                                 <th class="text-right">Amount</th>
                             </tr>
                             </thead>
-                            <tbody>
-
-                            <tr>
-                                <td></td>
-                                <td class="text-left">Monthly Rent</td>
-                                <td>Php '.$br['amount'].'</td>
-                            </tr>';
-                            $sql = "SELECT amount, description, id FROM _bill_items WHERE bid = '".$br['id']."'";
+                            <tbody>';
+                            $allowUnpaid = "true";
+                            $advpayment = 0;
+                            $bal = 0;
+                            $btotal = 0;
+                            $sql = "SELECT id, amount, status, date, tid FROM _bill WHERE status != 'paid' AND trid = '".$trid."' ORDER BY id ASC";
                             $stmt = $conn->prepare($sql);
                             $stmt->execute();
-                            while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
-                                echo '<tr>';
-                                echo '<td><a class="icmn icmn-minus" onclick="deleteval('.$result['id'].')"></td>';
-                                echo '<td class="text-left">'.$result['description'].'</td>';
-                                echo '<td>'.$result['amount'].'</td>';
-                                echo '</tr>';
+                            while($br = $stmt->fetch(PDO::FETCH_ASSOC)){
+//fiiiiix
+                            if($br['status'] == 'unpaid'){
+                                $sql = "SELECT SUM(amount) as biamount FROM _bill_items WHERE bid = '".$br['id']."'";
+                                $ss = $conn->prepare($sql);
+                                $ss->execute();
+                                $ssb = $ss->fetch(PDO::FETCH_ASSOC);
+                                if($ssb['biamount'] != 0 || $ssb['biamount'] != null){
+                                    $bal += $ssb['bamount'];
+                                }
+                                else{
+                                    $bal += $br['amount'];
+                                }
+
+                                /*
+                                echo '<script>alert("'.$trid.'");</script>';
+                                $sumOfbill = $s['bamt'] + $bro['amount'];
+                                if($sumOfbill - $s['pamt'] < 0){
+                                    $advpayment = $s['pamt'] - $sumOfbill;
+                                    echo '<tr>';
+                                    echo '<td></td>';
+                                    echo ' <td class="text-left">Advanced Payment</td>';
+                                    echo '<td>Php ('.$advpayment.')</td>';
+                                    echo '</tr>';
+                                    $total -= $advpayment;
+                                }
+                                if($sumOfbill - $s['pamt'] > 0){
+                                    $bal = $sumOfbill - $s['pamt'];
+                                    echo '<tr>';
+                                    echo '<td></td>';
+                                    echo ' <td class="text-left">Balance</td>';
+                                    echo '<td>Php '.$bal.' - payment ='.$s['pamt'].' - brid ='.$br['id'].' - trid = '.$trid.'</td>';
+                                    echo '</tr>';
+                                    $total += $bal;
+                                }*/
+                                
+                                
                             }
+
+                            if($br['status'] == 'pending'){
+
+                                $sql = "SELECT SUM(_payments.amount) as pamt FROM _payments WHERE _payments.tid = '".$trid."'";
+                                $sr = $conn->prepare($sql);
+                                $sr->execute();
+                                $s = $sr->fetch(PDO::FETCH_ASSOC);
+
+                                if($bal > $s['pamt']){
+                                    $btotal = $bal - $s['pamt'];
+                                    echo '<tr>';
+                                    echo '<td></td>';
+                                    echo ' <td class="text-left">Previous Balance</td>';
+                                    echo '<td>Php '.$btotal.'</td>';
+                                    echo '</tr>';
+                                    $total += $btotal;
+                                }
+
+                                if($bal < $s['pamt']){
+                                    $btotal = $bal - $s['pamt'];
+                                    echo '<tr>';
+                                    echo '<td></td>';
+                                    echo ' <td class="text-left">Advanced Payment</td>';
+                                    echo '<td>Php '.$btotal.'</td>';
+                                    echo '</tr>';
+                                    $total -= $btotal;
+                                }
+
+                                echo '<tr>';
+                                echo '<td></td>';
+                                echo '<td class="text-left">Monthly Rent</td>';
+                                echo '<td>Php '.$br['amount'].'</td>';
+                                echo '</tr>';
+                                $total += $br['amount'];
+
+
+                                $sql = "SELECT amount, description, id FROM _bill_items WHERE bid = '".$br['id']."'";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->execute();
+                                while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+                                    echo '<tr>';
+                                    echo '<td><a class="icmn icmn-minus" onclick="deleteval('.$result['id'].')"></td>';
+                                    echo '<td class="text-left">'.$result['description'].'</td>';
+                                    echo '<td>Php '.$result['amount'].'</td>';
+                                    echo '</tr>';
+                                    $total += $result['amount'];
+
+                                }
+                                break;
+                           
+                            }
+
+                            }
+  
 
                             echo '</tbody>
                         </table>
@@ -126,13 +211,6 @@
                     <div class="text-right clearfix">
                         <div class="pull-right">
                             <p class="page-invoice-amount">';
-                                $sql = "SELECT SUM(amount) as subtotal FROM _bill_items WHERE bid = '".$br['id']."'";
-                                $stmt = $conn->prepare($sql);
-                                $stmt->execute();
-                                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                                $r =  doubleval($result['subtotal']);
-                                $brtotal = doubleval($br['amount']);
-                                $total = $r + $brtotal;
                             echo '<strong>Total: <span>Php '.$total.'</span></strong>
                             </p>
                             <br />
@@ -141,7 +219,7 @@
                     <div class="text-right">
                         <button type="button" class="btn btn-primary" onclick="showmodal2();">
                             <i class="icmn-checkmark margin-right-5"></i>
-                            Mark as paid
+                            Issue Payment
                         </button>
                         <button type="button" class="btn btn-default" onclick="javascript:window.print();">
                             <i class="icmn-printer margin-right-5"></i>
@@ -153,7 +231,7 @@
         </div>
     </div>';
     break;
-    	}
+    }
     }//end of current
 
     if(isset($_POST['pending'])){
