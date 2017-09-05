@@ -4,6 +4,41 @@
     include('../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    if($_POST['submit']){
+        $firstName = $_POST['firstName'];
+        $lastName = $_POST['lastName'];
+        $address = $_POST['address'];
+        $email = $_POST['email'];
+        $contactNumber = $_POST['contactNumber'];
+        $guardianName = $_POST['guardianName'];
+        $guardianAddress = $_POST['guardianAddress'];
+        $guardianContact = $_POST['guardianContact'];
+        $id = $_POST['id'];
+
+        $sql = "UPDATE _tenantprofile SET 
+        firstName = :firstName, 
+        lastName = :lastName,
+        address = :address,
+        email = :email,
+        contactNumber = :contactNumber,
+        guardianName = :guardianName,
+        guardianAddress = :guardianAddress,
+        guardianContact = :guardianContact
+        WHERE id = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam("firstName",$firstName);
+        $stmt->bindParam("lastName",$lastName);
+        $stmt->bindParam("address",$address);
+        $stmt->bindParam("email",$email);
+        $stmt->bindParam("contactNumber",$contactNumber);
+        $stmt->bindParam("guardianName",$guardianName);
+        $stmt->bindParam("guardianAddress",$guardianAddress);
+        $stmt->bindParam("guardianContact",$guardianContact);
+        $stmt->bindParam("id",$id);
+        $stmt->execute();
+
+
+    }
     include('head.php'); 
  ?>
 <body class="mode-default colorful-enabled theme-red">
@@ -16,16 +51,6 @@
     </div>
     <div class="left-menu-inner scroll-pane">
         <ul class="left-menu-list left-menu-list-root list-unstyled">
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-success"></span> All Good 
-                </div>
-            </li>
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-danger"></span> Sumting Wong
-                </div>
-            </li>
             <li class="left-menu-list-separator "><!-- --></li>
             <li>
                 <a class="left-menu-link" href="index.php">
@@ -195,8 +220,8 @@
                                 <th>Floor</th>
                                 <th>Unit</th>
                                 <th>Rent</th>
-                                <th>Monthly Balance</th>
-                                <th>Total Balance</th>
+                                <th>Profile</th>
+                                <th>Actions</th>
                             </tr>
                             </thead>
                             <tfoot>
@@ -205,8 +230,8 @@
                                 <th>Floor</th>
                                 <th>Unit</th>
                                 <th>Rent</th>
-                                <th>Monthly Balance</th>
-                                <th>Total Balance</th>
+                                <th>Profile</th>
+                                <th>Actions</th>
                             </tr>
                             </tfoot>
                             <tbody>
@@ -215,7 +240,7 @@
                                 $currentMonth = date('m');
                                 $currentYear = date('Y');
                                 $tenantDay = "";
-                                $sql = "SELECT _tenantprofile.firstName as fName, _tenantprofile.lastName as lName, _tenantrentinginformation.uid as uid, _tenantrentinginformation.adjustedRentPerMonth as rpm, _tenantprofile.balance as balance, _tenantprofile.id as tenantid, _tenantrentinginformation.id as trid FROM _tenantrentinginformation INNER JOIN _tenantprofile ON _tenantrentinginformation.tid = _tenantprofile.id WHERE _tenantprofile.oid = :id";
+                                $sql = "SELECT  _tenantprofile.firstName as fName, _tenantprofile.lastName as lName, _tenantrentinginformation.uid as uid, _tenantrentinginformation.adjustedRentPerMonth as rpm, _tenantprofile.balance as balance, _tenantprofile.id as tenantid, _tenantrentinginformation.id as trid FROM _tenantrentinginformation INNER JOIN _tenantprofile ON _tenantrentinginformation.tid = _tenantprofile.id WHERE _tenantprofile.oid = :id";
                                 $stmt = $conn->prepare($sql);
                                 $stmt->bindParam('id', $_SESSION['id']);
                                 $stmt->execute();
@@ -258,8 +283,8 @@
                                     echo '<td>'.$result['floorName'].'</td>';
                                     echo '<td>'.$result['unitName'].'</td>';
                                     echo '<td>'.$row['rpm'].'</td>';
-                                    echo '<td>'.$sumrent['amt'].'</td>';
-                                    echo '<td>'.$row['balance'].'</td>';
+                                    echo '<td><button class="btn btn-warning" onclick="launchModal('.$row['tenantid'].');">View/Edit</td>';
+                                    echo '<td><button class="btn btn-success" onclick="changeRoom('.$row['tenantid'].');">Change Room<br><button class="btn btn-danger" onclick="delete('.$row['tenantid'].');">Delete Tenant</td>';
                                     echo '</tr>';
 
                                 }
@@ -321,11 +346,38 @@
             </div>
         </div>
     </section>
+    <section name="formodal" id="formodal"></section>
     <!-- End  -->
 
 </div>
 
 <!-- Page Scripts -->
+<script type="text/javascript">
+    function launchModal(selectedTenant){
+        var tid = selectedTenant;
+        $.ajax
+    ({
+        url: "../controllers/viewtenantp.php",
+        type:'POST',
+        data:
+        {
+            tid: tid
+        },
+        success: function(result)
+        {   
+           $("#formodal").html(result);
+           $('#tview').modal('show');
+        }               
+    });
+    }
+    function changeRoom(selectedTenant){
+
+    }
+
+    function deleteTenant(selectedTenant){
+        
+    }
+</script>
 <script>
     $(function(){
 
@@ -335,6 +387,16 @@
         
         $('#tblInactive').DataTable({
             responsive: true
+        });
+
+        $('#tenant').validate({
+            submit: {
+                settings: {
+                    inputContainer: '.form-group',
+                    errorListClass: 'form-control-error',
+                    errorClass: 'has-danger'
+                }
+            }
         });
 
     });

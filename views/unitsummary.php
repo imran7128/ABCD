@@ -16,16 +16,7 @@
     </div>
     <div class="left-menu-inner scroll-pane">
         <ul class="left-menu-list left-menu-list-root list-unstyled">
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-success"></span> All Good 
-                </div>
-            </li>
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-danger"></span> Sumting Wong
-                </div>
-            </li>
+
             <li class="left-menu-list-separator "><!-- --></li>
             <li>
                 <a class="left-menu-link" href="index.php">
@@ -210,7 +201,7 @@
                             <tbody>
                             <tr>
                                 <?php
-                                   $sql = "SELECT _floor.floorName AS floorName, _unit.unitName AS unitName, _unit.rentPerTenant as rent, _unit.currentTenant AS current FROM _floor INNER JOIN _unit ON _unit.floor_id = _floor.id WHERE _floor.oid = :id AND _unit.tenantAllowed = _unit.currentTenant";
+                                   $sql = "SELECT _unit.id as uid, _floor.floorName AS floorName, _unit.unitName AS unitName, _unit.rentPerTenant as rent, _unit.currentTenant AS current FROM _floor INNER JOIN _unit ON _unit.floor_id = _floor.id WHERE _floor.oid = :id AND _unit.tenantAllowed = _unit.currentTenant";
                                     $stmt = $conn->prepare($sql);
                                     $stmt->bindParam(':id', $_SESSION['id']);
                                     $stmt->execute();
@@ -220,7 +211,7 @@
                                         echo '<td>'.$row['unitName'].'</td>';
                                         echo '<td>'.$row['rent'].'</td>';
                                         echo '<td>'.$row['current'].'</td>';
-                                        echo '<td>View Tenants</td>';
+                                        echo '<td><button class="btn btn-success" onclick="launchModal('.$row['uid'].');">View</td>';
                                         echo '</tr>';
                                     }
                                     
@@ -291,11 +282,34 @@
             </div>
         </div>
     </section>
+    <section name="formodal" id="formodal">
+        
+    </section>
     <!-- End  -->
 
 </div>
 
 <!-- Page Scripts -->
+<script type="text/javascript">
+    function launchModal(selectedUnit){
+
+        var uid = selectedUnit;
+        $.ajax
+    ({
+        url: "../controllers/viewtenant.php",
+        type:'POST',
+        data:
+        {
+            uid: uid
+        },
+        success: function(result)
+        {   
+           $("#formodal").html(result);
+           $('#tview').modal('show');
+        }               
+    });
+    }
+</script>
 <script>
     $(function(){
 

@@ -130,7 +130,7 @@
         $stmt3->execute();
         $tenantid=$stmt3->fetch(PDO::FETCH_ASSOC);
 
-        $sql = "SELECT _unit.id as id FROM _unit INNER JOIN _floor ON _unit.floor_id = _floor.id WHERE _floor.oid = :id AND _unit.id = :unit";
+        $sql = "SELECT _unit.id as id FROM _unit INNER JOIN _floor ON _unit.floor_id = _floor.id WHERE _floor.oid = :id AND _unit.unitName = :unit";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':id', $_SESSION['id']);
         $stmt->bindParam(':unit', $unitName);
@@ -146,7 +146,7 @@
         $stmt->bindParam(':endDate',$endDate);
         $stmt->bindParam(':totalMonths',$totalMonths);
         $stmt->bindParam(':collectionDay',$collectionDay);
-        $stmt->bindParam(':balance',$balance);
+        $stmt->bindParam(':balance',$adjustedRentPerMonth);
         $stmt->bindParam(':adjustedRentPerMonth',$adjustedRentPerMonth);
         if(isset($_GET['tid'])){
             $stmt->bindParam(':tid', $_GET['tid']);

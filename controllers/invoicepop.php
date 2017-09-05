@@ -6,6 +6,7 @@
     $trid = $_POST['trid'];
     $uid = $_POST['uid'];
     $_POST['balancetotal'] = "";
+    
 
     if($_POST['trid'] && $_POST['uid']){
         $sql = "SELECT
@@ -30,6 +31,7 @@
     
 
     if(isset($_POST['current'])){
+        $_SESSION['current_excess_payment'] = 0;
         $total = 0;
     	$billid = "";
         $d  = "";
@@ -120,7 +122,7 @@
                                 $ss->execute();
                                 $ssb = $ss->fetch(PDO::FETCH_ASSOC);
                                 if($ssb['biamount'] != 0 || $ssb['biamount'] != null){
-                                    $bal += $ssb['bamount'];
+                                    $bal += $ssb['bamount'] + $br['amount'];
                                 }
                                 else{
                                     $bal += $br['amount'];
@@ -169,13 +171,64 @@
                                 }
 
                                 if($bal < $s['pamt']){
-                                    $btotal = $bal - $s['pamt'];
+                                    $stbamt = 0;
+                                    $subt = 0;
+                                    $sql  = "SELECT id, status, _bill.amount as bamt FROM  _bill WHERE trid = '".$trid."' ORDER BY id ASC";
+                                    $stmt = $conn->prepare($sql);
+                                    $stmt->execute();
+                                    while($st = $stmt->fetch(PDO::FETCH_ASSOC)){
+                                        $stbamt = $st['bamt'];
+                                        $sql = "SELECT SUM(amount) as biamount FROM _bill_items WHERE bid = '".$st['id']."'";
+                                        $ss = $conn->prepare($sql);
+                                        $ss->execute();
+                                        $ssb = $ss->fetch(PDO::FETCH_ASSOC);
+                                        if($ssb['biamount'] != 0 || $ssb['biamount'] != null){
+                                            $subt += $ssb['bamount'] + $stbamt;
+                                        }
+                                        else{
+                                            $subt += $stbamt;
+                                        }
+                                        if($st['status'] == 'pending'){
+                                            if($s['pamt'] < $subt){
+                                                //diff nalang yung balance overall
+                                                $diff = $subt - $s['pamt'];
+                                                $sql = "SELECT SUM(amount) as biamt FROM _bill_items WHERE bid = '".$st['id']."'";
+                                                $stmt = $conn->prepare($sql);
+                                                $stmt->execute();
+                                                $bb = $stmt->fetch(PDO::FETCH_ASSOC);
+                                                $currentTotal = $bb['biamt'] + $st['bamt'];
+                                                $holder = $currentTotal - $diff;
+                                                $total -= $holder;
+                                                echo '<tr>';
+                                                echo '<td></td>';
+                                                echo ' <td class="text-left">Advanced Payment</td>';
+                                                echo '<td>Php ('.$holder.')</td>';
+                                                echo '</tr>';
+                                                $_SESSION['current_excess_payment'] = $holder;
+                                                //break;
+                                            }
+
+                                        }
+                                    }
+                                    /*
+                                    $sql = "SELECT SUM(_bill_items.amount) as bamt FROM _bill_items  WHERE bid = '".$br['id']."'";
+                                    $stmt = $conn->prepare($sql);
+                                    $stmt->execute();
+                                    $r = $stmt->fetch(PDO::FETCH_ASSOC);
+                                   // c
+                                    if($r['bamt'] == 0 || $r['bamt']  == null){
+                                        $btotal = $s['pamt'] - $br['amount'];
+                                    }
+                                    else{
+                                        $btotal = $s['pamt'] - $r['bamt'] + $br['amount'];
+                                    }
                                     echo '<tr>';
                                     echo '<td></td>';
                                     echo ' <td class="text-left">Advanced Payment</td>';
                                     echo '<td>Php '.$btotal.'</td>';
                                     echo '</tr>';
                                     $total -= $btotal;
+                                    */
                                 }
 
                                 echo '<tr>';
@@ -196,6 +249,7 @@
                                     echo '<td>Php '.$result['amount'].'</td>';
                                     echo '</tr>';
                                     $total += $result['amount'];
+                                    
 
                                 }
                                 break;

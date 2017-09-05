@@ -378,7 +378,7 @@
         {   
             alert(result);
             $('#pay').modal('hide');
-            changepaid("1");
+            //changepaid("1");
             current.click();
         }               
     });

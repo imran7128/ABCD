@@ -17,16 +17,6 @@
     </div>
     <div class="left-menu-inner scroll-pane">
         <ul class="left-menu-list left-menu-list-root list-unstyled">
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-success"></span> All Good 
-                </div>
-            </li>
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-danger"></span> Sumting Wong
-                </div>
-            </li>
             <li class="left-menu-list-separator "><!-- --></li>
             <li class="left-menu-list-active">
                 <a class="left-menu-link" href="index.php">

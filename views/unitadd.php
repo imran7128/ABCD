@@ -48,16 +48,6 @@
     </div>
     <div class="left-menu-inner scroll-pane">
         <ul class="left-menu-list left-menu-list-root list-unstyled">
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-success"></span> All Good 
-                </div>
-            </li>
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-danger"></span> Sumting Wong
-                </div>
-            </li>
             <li class="left-menu-list-separator "><!-- --></li>
             <li>
                 <a class="left-menu-link" href="index.php">
@@ -244,15 +234,6 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control" placeholder="Unit Name" id="l0" name="unit" data-validation=[NOTEMPTY]>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="l0">Rent Per Month</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Monthly Rent" id="l0", name="rent" data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
 

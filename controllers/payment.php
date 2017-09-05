@@ -6,59 +6,94 @@
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     if($_POST['tid']){
-        //tid id tenant id
-    	$date = date('d-m-Y');
-    	$sql = "INSERT INTO _payments (tid, bid, description, amount, date) VALUES (:tid, :bid, :description, :amount, :date)";
-    	$stmt = $conn->prepare($sql);
-    	$stmt->bindParam(':tid', $_POST['tid']);
-    	$stmt->bindParam(':bid', $_SESSION['current_bill_id']);
-    	$stmt->bindParam(':amount', $_POST['amount']);
-    	$stmt->bindParam(':description', $_POST['description']);
-    	$stmt->bindParam(':date', $date);
-    	$stmt->execute();
+        $t = 0;
+        $payment = $_POST['amount'];
+        $sql = "SELECT trid FROM _bill WHERE id = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(":id", $_SESSION['current_bill_id']);
+        $stmt->execute();
+        $trid = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $sql = "SELECT COUNT(*) as count, SUM(_bill.amount) as billamount, SUM(_bill_items.amount) as itemamount FROM _bill INNER JOIN _bill_items ON _bill_items.bid = _bill.id WHERE _bill.tid = '".$_POST['tid']."' AND _bill.status = 'unpaid'";
+        $sql = "SELECT id, amount FROM _bill WHERE trid = '".$trid['trid']."' AND status != 'paid' ORDER BY id ASC";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
-        $bsum = $stmt->fetch(PDO::FETCH_ASSOC);
+        while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $sql = "SELECT SUM(amount) as bamt FROM _bill_items WHERE bid = '".$result['id']."'";
+            $s = $conn->prepare($sql);
+            $s->execute();
+            $st = $s->fetch(PDO::FETCH_ASSOC);
+            $t = $st['bamt'] + $result['amount'] - $_SESSION['current_excess_payment'];
+            $_SESSION['current_excess_payment'] =0;
+            echo '<script>alert("'.$payment.' - '.$t.'");</script>';
+            if($payment >= $t){
+                $sql1 = "UPDATE _bill SET status = 'paid' WHERE id = :id";
+                $stmt1 = $conn->prepare($sql1);
+                $stmt1->bindParam(':id', $result['id']);
+                $stmt1->execute();
+                $payment = $payment - $t;
 
-        $sql = "SELECT SUM(amount) as psum FROM _payments WHERE tid = '".$_POST['tid']."'";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $psum = $stmt->fetch(PDO::FETCH_ASSOC);
+                $date = date('d-m-Y');
+                $sql2 = "INSERT INTO _payments (tid, bid, description, amount, date) VALUES (:tid, :bid, :description, :amount, :date)";
+                $stmt2 = $conn->prepare($sql2);
+                $stmt2->bindParam(':tid', $_POST['tid']);
+                $stmt2->bindParam(':bid', $result['id']);
+                $stmt2->bindParam(':amount', $t);
+                $stmt2->bindParam(':description', $_POST['description']);
+                $stmt2->bindParam(':date', $date);
+                $stmt2->execute();
 
-        $d = $bsum['count'];
-        $totalBill = $bsum['billamount'] + $bsum['itemamount'];
+                $sql3 = "UPDATE _bill SET status = 'paid' WHERE id = :id";
+                $stmt3 = $conn->prepare($sql3);
+                $stmt3->bindParam(':id', $_SESSION['current_bill_id']);
+                $stmt3->execute();
 
-        if($d == 0){
-            $sql = "UPDATE _bill SET status = 'paid' WHERE id = :id";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id', $_SESSION['current_bill_id']);
-            $stmt->execute();
-        }
-        if($d > 0){
-            if($psum['psum'] >= $totalBill){
-                $sql = "UPDATE _bill SET status = 'paid' WHERE status = 'unpaid' AND tid = :tid";
-                $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':tid', $_POST['tid']);
-                $stmt->execute();
             }
             else{
-                $sql = "SELECT _bill.id as id, COUNT(*) as count, SUM(_bill.amount) as billamount, SUM(_bill_items.amount) as itemamount FROM _bill INNER JOIN _bill_items ON _bill_items.bid = _bill.id WHERE _bill.tid = '".$_POST['tid']."' AND _bill.status = 'unpaid'";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute();
-                while($bb = $stmt->fetch(PDO::FETCH_ASSOC)){
-                    $current = $bb['billamount'] + $bb['itemamount'];
-                    if($psum['psum'] - $current >= 0){
-                        $sql = "UPDATE _bill SET status = 'paid' WHERE status = 'unpaid' AND id = :id";
-                        $stmt = $conn->prepare($sql);
-                        $stmt->bindParam(':id', $bb['id']);
-                        $stmt->execute();
-                        $psum['psum'] -= $current;
-                    }
-                }
+                $date = date('d-m-Y');
+                $sql4 = "INSERT INTO _payments (tid, bid, description, amount, date) VALUES (:tid, :bid, :description, :amount, :date)";
+                $stmt4 = $conn->prepare($sql4);
+                $stmt4->bindParam(':tid', $_POST['tid']);
+                $stmt4->bindParam(':bid', $result['id']);
+                $stmt4->bindParam(':amount', $payment);
+                $stmt4->bindParam(':description', $_POST['description']);
+                $stmt4->bindParam(':date', $date);
+                $stmt4->execute();
+                break;
             }
+                
         }
+        $sum =0;
+        $sql = "SELECT id,tid,amount FROM _bill WHERE trid = '".$trid['trid']."' AND status = 'unpaid' ORDER BY id ASC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+            $sql1 = "SELECT SUM(amount) as pamt FROM _payments WHERE tid = '".$result['tid']."'";
+            $s = $conn->prepare($sql1);
+            $s->execute();
+            $sump = $s->fetch(PDO::FETCH_ASSOC);
+
+            $sql = "SELECT SUM(amount) as bamt FROM _bill_items WHERE bid = '".$result['id']."'";
+            $s = $conn->prepare($sql);
+            $s->execute();
+            $bamt = $s->fetch(PDO::FETCH_ASSOC);
+            $sum = $bamt['bamt']  + $result['amount'];
+            if($sump > $sum){
+                $sql2 = "UPDATE _bill SET status = 'paid' WHERE id = :id";
+                $stmt2 = $conn->prepare($sql2);
+                $stmt2->bindParam(':id', $result['id']);
+                $stmt2->execute();
+            }
+            if($sump == $sum){
+                $sql2 = "UPDATE _bill SET status = 'paid' WHERE id = :id";
+                $stmt2 = $conn->prepare($sql2);
+                $stmt2->bindParam(':id', $result['id']);
+                $stmt2->execute();
+            }
+
+
+        }
+
+
 
     }
 ?>
