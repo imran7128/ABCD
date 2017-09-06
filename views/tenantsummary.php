@@ -4,7 +4,38 @@
     include('../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    if($_POST['submit']){
+    $tenant_selected_id = 0;
+    if(isset($_POST['deleteTenant'])){
+        $sql = "SELECT uid FROM _tenantrentinginformation WHERE tid = '".$tenant_selected_id."'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $sql = "DELETE * FROM _tenantrentinginformation WHERE tid = '".$tenant_selected_id."'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        $sql = "SELECT currentTenant FROM _unit WHERE uid = '".$result['uid']."'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $currentTenant = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $sql = "UPDATE _unit SET currentTenant = :currentTenant WHERE uid = '".$result['uid']."'";
+        $stmt = $conn->prepare($sql);
+        $currentTenant['currentTenant'] -= 1;
+        $stmt->bindParam("currentTenant", $currentTenant);
+        $stmt->execute();
+
+        $sql = "DELETE * FROM _bill WHERE tid = '".$tenant_selected_id."'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        $sql = "DELETE * FROM _payments WHERE tid = '".$tenant_selected_id."'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+    }
+    if(isset($_POST['submit'])){
         $firstName = $_POST['firstName'];
         $lastName = $_POST['lastName'];
         $address = $_POST['address'];
@@ -284,7 +315,7 @@
                                     echo '<td>'.$result['unitName'].'</td>';
                                     echo '<td>'.$row['rpm'].'</td>';
                                     echo '<td><button class="btn btn-warning" onclick="launchModal('.$row['tenantid'].');">View/Edit</td>';
-                                    echo '<td><button class="btn btn-success" onclick="changeRoom('.$row['tenantid'].');">Change Room<br><button class="btn btn-danger" onclick="delete('.$row['tenantid'].');">Delete Tenant</td>';
+                                    echo '<td><button class="btn btn-danger" onclick="deleteTenant('.$row['tenantid'].');">Delete Tenant</td>';
                                     echo '</tr>';
 
                                 }
@@ -370,11 +401,43 @@
         }               
     });
     }
+    /*
     function changeRoom(selectedTenant){
+        var tid = selectedTenant;
+        $.ajax
+    ({
+        url: "../controllers/changeroom.php",
+        type:'POST',
+        data:
+        {
+            tid: tid
+        },
+        success: function(result)
+        {   
+           $("#formodal").html(result);
+           $('#tview').modal('show');
+        }               
+    });
 
     }
+    */
 
     function deleteTenant(selectedTenant){
+        var tid = selectedTenant;
+        $.ajax
+    ({
+        url: "../controllers/tenantdelete.php",
+        type:'POST',
+        data:
+        {
+            tid: tid
+        },
+        success: function(result)
+        {   
+           $("#formodal").html(result);
+           $('#tview').modal('show');
+        }               
+    });
         
     }
 </script>

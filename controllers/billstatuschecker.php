@@ -62,4 +62,51 @@
 			$s->execute();
 	}
 
+	//if expired na, gawa ka din kung 7 days before mag expire
+	$currentDate = date('d-m-Y');
+	$sql = "SELECT endDate,id FROM _tenantprofile WHERE oid = '".$_SESSION['id']."'";
+	$stmt = $conn->prepare($sql);;
+	$stmt->execute();
+	while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+		if(strtotime($currentDate) < strtotime($result['endDate'])){
+			//expired
+			$totalamount = 0;
+			$totalpaid = 0;
+			$totalbal = 0;
+			$sql1 = "SELECT amount, id FROM _bill WHERE tid = '".$result['id']."'";
+			$stmt1 = $conn->prepare($sql1);
+			$stmt1->execute();
+			while($b = $stmt1->fetch(FETCH_ASSOC)){
+				$sql2 = "SELECT SUM(amount) as bamt FROM _bill_items WHERE bid = '".$b['id']."'";
+				$stmt2 = $conn->prepare($sql2);
+				$stmt2->execute();
+				$bamt = $stmt2->fetch(PDO::FETCH_ASSOC);
+				if($bamt['bamt'] != 0 || $bamt['bamt'] != null){
+					$totalamount += $b['amount'] + $bamt['bamt'];
+				}
+				else{
+					$totalamount += $b['amount'];
+				}
+			}
+
+			$sql3 = "SELECT SUM(amount) as pamt FROM _payments WHERE tid = '".$result['id']."'";
+			$stmt3 = $conn->prepare($sql3);
+			$stmt3 ->execute();
+			$pamt = $stmt3->fetch(PDO::FETCH_ASSOC);
+
+			$totalbal = $totalamount - $pamt['pamt'];
+			if($totalbal <0 ){
+				$totalbal = 0;
+			}
+			$sql4 = "UPDATE _tenantprofile SET balance = '".$totalbal."' WHERE id = '".$result['id']."'";
+			$stmt4 = $conn->prepare($sql4);
+			$stmt4->execute();
+
+		}
+		//if today is within
+		//7, 3,2,1 days, may alert
+		date_sub($result['endDate'], date_interval_create_from_date_string('7 days'));
+		if(strtotime($result['endDate']) =)
+	}
+
 ?>

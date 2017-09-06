@@ -1,4 +1,5 @@
 <?php
+//if date today is within issue date dun lang ipapakita sa tenant
 	include('../controllers/config.php');
     include('../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);

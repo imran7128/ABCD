@@ -63,7 +63,7 @@
 
     if(isset($_POST['firstName'])){
         $totalMonths = $_POST['totalMonth'];
-        $balance = $_POST['totalMRent'];
+        $balance = 0;//$_POST['totalMRent'];
         $additionalPayment = $_POST['addPayment'];
         $discount = $_POST['disc'];
         $adjustedRentPerMonth = $_POST['aRPMt'];
@@ -146,7 +146,7 @@
         $stmt->bindParam(':endDate',$endDate);
         $stmt->bindParam(':totalMonths',$totalMonths);
         $stmt->bindParam(':collectionDay',$collectionDay);
-        $stmt->bindParam(':balance',$adjustedRentPerMonth);
+        $stmt->bindParam(':balance',$balance);
         $stmt->bindParam(':adjustedRentPerMonth',$adjustedRentPerMonth);
         if(isset($_GET['tid'])){
             $stmt->bindParam(':tid', $_GET['tid']);
@@ -154,7 +154,13 @@
         else{
             $stmt->bindParam(':tid', $tenantid['id']);
         }
-        $stmt->bindParam(':uid', $unitid['id']);
+        if(isset($_GET['uid'])){
+            $stmt->bindParam(':uid', $_GET['uid']);
+        }
+        else{
+            $stmt->bindParam(':uid', $unitid['id']);
+        }
+        
         $stmt->execute();
 
         $sql = "UPDATE `_unit` SET currentTenant = currentTenant + :add WHERE id = :uid";
