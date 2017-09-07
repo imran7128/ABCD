@@ -3,7 +3,7 @@
     if($_POST){
         $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "SELECT COUNT(*), id FROM `_owner` WHERE username = :username AND password = :password";
+        $sql = "SELECT COUNT(*), id, first_name FROM `_owner` WHERE username = :username AND password = :password";
         
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $username);
@@ -18,6 +18,7 @@
             session_start();
             session_id();
             $_SESSION['current_user'] = $_POST['username'];
+            $_SESSION['current_user_first_name'] = $row['first_name'];
             $_SESSION['id'] = $row['id'];
             $_SESSION['usuccess'] = 'undefined';
             $_SESSION['tsuccess'] = 'undefined';
@@ -46,14 +47,7 @@
                 </div>
             </div>
             <div class="col-lg-8">
-                <div class="single-page-block-header-menu">
-                    <ul class="list-unstyled list-inline">
-                        <li><a href="javascript: history.back();">&larr; Back</a></li>
-                        <li class="active"><a href="javascript: void(0);">Login</a></li>
-                        <li><a href="javascript: void(0);">About</a></li>
-                        <li><a href="javascript: void(0);">Support</a></li>
-                    </ul>
-                </div>
+
             </div>
         </div>
     </div>
@@ -100,13 +94,7 @@
         </div>
     </div>
     <div class="single-page-block-footer text-center">
-        <ul class="list-unstyled list-inline">
-            <li><a href="javascript: void(0);">Terms of Use</a></li>
-            <li class="active"><a href="javascript: void(0);">Compliance</a></li>
-            <li><a href="javascript: void(0);">Confidential Information</a></li>
-            <li><a href="javascript: void(0);">Support</a></li>
-            <li><a href="javascript: void(0);">Contacts</a></li>
-        </ul>
+
     </div>
     <!-- End Login Page -->
 
