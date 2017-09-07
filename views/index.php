@@ -1,7 +1,6 @@
 <?php
     include('../controllers/config.php');
     include('../controllers/session.php');
-    include('../controllers/billstatuschecker.php');
     include('head.php'); 
     //session_start();
     //call billstatuschecker
@@ -74,25 +73,14 @@
                     Billing
                 </a>
             </li>
-            
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
-                    Notices
+
+            <li>
+                <a class="left-menu-link" href="messages.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
+                    Messages
                 </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="tables-basic-tables.html">
-                            Summary
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="tables-datatables.html">
-                            Edit
-                        </a>
-                    </li>
-                </ul>
             </li>
-            
+
             <li class="left-menu-list-separator"><!-- --></li>
             <li>
                 <a class="left-menu-link" href="apps-profile.html">
@@ -122,14 +110,12 @@
         <div class="menu-user-block">
             <div class="dropdown dropdown-avatar">
                 <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <span class="avatar" href="javascript:void(0);">
-                        <img src="../assets/common/img/temp/avatars/1.jpg" alt="Alternative text to the image">
-                    </span>
+                    Welcome, <?php echo $_SESSION['current_user_first_name'];?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="" role="menu">
                     <a class="dropdown-item" href="javascript:void(0)"><i class="dropdown-icon icmn-user"></i> Profile</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="javascript:void(0)"><i class="dropdown-icon icmn-exit"></i> Logout</a>
+                    <a class="dropdown-item" href="logout.php"><i class="dropdown-icon icmn-exit"></i> Logout</a>
                 </ul>
             </div>
         </div>
@@ -151,9 +137,9 @@
             </div>
         </form>
         </div>
-    -->
+    --> <?php include('../controllers/billstatuschecker.php');?>
         <div class="row">
-            <div class="col-xl-3 col-lg-6 col-sm-6 col-xs-12">
+            <div class="col-xl-6 col-lg-6 col-sm-6 col-xs-12">
                 <div class="widget widget-seven background-success">
                     <div class="widget-body">
                         <div href="javascript: void(0);" class="widget-body-inner">
@@ -177,7 +163,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-6 col-sm-6 col-xs-12">
+            <div class="col-xl-6 col-lg-6 col-sm-6 col-xs-12">
                 <div class="widget widget-seven background-default">
                     <div class="widget-body">
                         <div href="javascript: void(0);" class="widget-body-inner">
@@ -201,11 +187,11 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-6 col-sm-6 col-xs-12">
+            <div class="col-xl-6 col-lg-6 col-sm-6 col-xs-12">
                 <div class="widget widget-seven">
                     <div class="widget-body">
                         <div href="javascript: void(0);" class="widget-body-inner">
-                            <h5 class="text-uppercase">Active Tenants</h5>
+                            <h5 class="text-uppercase">Renting Tenants</h5>
                             <i class="counter-icon icmn-users"></i>
                             <span class="counter-count">
                                 <i class="icmn-arrow-up5"></i>
@@ -217,6 +203,7 @@
                                     $stmt->bindParam(':id', $_SESSION['id']);
                                     $stmt->execute();
                                     $number_of_rows = $stmt->fetchColumn();
+                                    $active = $number_of_rows;
                                     echo '<span class="counter-init" data-from="0" data-to="'.$number_of_rows.'"></span>';
                                 ?> 
                             </span>
@@ -224,23 +211,24 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-6 col-sm-6 col-xs-12">
+            <div class="col-xl-6 col-lg-6 col-sm-6 col-xs-12">
                 <div class="widget widget-seven">
                     <div class="widget-body">
                         <div href="javascript: void(0);" class="widget-body-inner">
-                            <h5 class="text-uppercase">Pending Collection</h5>
+                            <h5 class="text-uppercase">Space Available</h5>
                             <i class="counter-icon icmn-stack-text"></i>
                             <span class="counter-count">
                                 <i class="icmn-arrow-up5"></i>
                                 <?php
                                     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
                                     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                    $sql = "SELECT SUM(balance) FROM _tenantprofile WHERE oid = :id";
+                                    $sql = "SELECT _unit.tenantAllowed as allowed, _unit.currentTenant as current FROM _floor INNER JOIN _unit ON _unit.floor_id = _floor.id  WHERE _floor.oid = :id";
                                     $stmt = $conn->prepare($sql);
                                     $stmt->bindParam(':id', $_SESSION['id']);
                                     $stmt->execute();
-                                    $number_of_rows = $stmt->fetchColumn();
-                                    echo '<span class="counter-init" data-from="0" data-to="'.$number_of_rows.'"></span>';
+                                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                                    $avail = $result['allowed'] - $result['current'];
+                                    echo '<span class="counter-init" data-from="0" data-to="'.$avail.'"></span>';
                                 ?> 
                             </span>
                         </div>
@@ -259,7 +247,7 @@
                                         <i class="icmn-database"></i> Available Units
                                     </h2>
                                     <p>
-                                        Current: 15
+                                        Current: <?php echo $avail; ?>
                                         <br />
                                     </p>
                                 </a>
@@ -270,9 +258,15 @@
                                         <i class="icmn-users"></i> Tenants
                                     </h2>
                                     <p>
-                                        Total: 500
+                                    <?php
+                                        $sql = "SELECT COUNT(*) as total FROM _tenantprofile WHERE oid = '".$_SESSION['id']."'";
+                                        $stmt = $conn->prepare($sql);
+                                        $stmt->execute();
+                                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                                    ?>
+                                        Total: <?php echo $result['total'];?>
                                         <br />
-                                        Active: 67
+                                        Active: <?php echo $active;?>
                                     </p>
                                 </a>
                             </div>
@@ -322,86 +316,11 @@
                                     </p>
                                 </a>
                             </div>
-                            <div class="carousel-item">
-                                <a href="javascript: void(0);" class="widget-body">
-                                    <h2>Settings</h2>
-                                    <p>
-                                        Payment Options
-                                        <br />
-                                    </p>
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- CALENDAR
-        <div class="row">
-            <div class="col-xl-12">
-                <div class="widget widget-three">
-                    <div class="example-calendar-block"></div>
-                </div>
-            </div>
-        </div>
-        -->
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="panel panel-with-borders">
-                <div class="panel-body">
-                    <div class="nav-tabs-horizontal margin-bottom-20">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="javascript: void(0);" data-toggle="tab" data-target="#h1" role="tab">Registered Tenants</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <table class="table table-hover nowrap margin-bottom-0" id="example1" width="100%">
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Unit</th>
-                            <th>Floor</th>
-                            <th>Amount Due</th>
-                            <th>Date</th>
-                            <th>Balance</th>
-                        </tr>
-                        </thead>
-                        <tfoot>
-                        <tr>
-                            <th>Name</th>
-                            <th>Unit</th>
-                            <th>Floor</th>
-                            <th>Amount Due</th>
-                            <th>Date</th>
-                            <th>Balance</th>
-                        </tr>
-                        </tfoot>
-                        <tbody>
-                            <?php
-                                $sql = "SELECT firstName, lastName FROM _tenantprofile WHERE oid = :id";
-                                $stmt = $conn->prepare($sql);
-                                $stmt->bindParam(':id', $_SESSION['id']);
-                                $stmt->execute();
-                                while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-                                    echo '<tr>';
-                                    echo '<td>'.$row['firstName'].' '.$row['lastName'].'</td>';
-                                    echo '<td> Unit </td>';
-                                    echo '<td> Floor </td>';
-                                    echo '<td> Amount due for Month</td>';
-                                    echo '<td>Date Registered</td>';
-                                    echo '<td> total balance </td>';
-                                    echo '</tr>';
-                                }
-
-                            ?>
-                        <!-- TABLE CONTENTS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- End Dashboard -->
 
 </div>
@@ -417,11 +336,6 @@
             speed: 1500
         });
 
-        ///////////////////////////////////////////////////////////
-        // ADJUSTABLE TEXTAREA
-        autosize($('#textarea'));
-
-        ///////////////////////////////////////////////////////////
         // CUSTOM SCROLL
         if (!cleanUI.hasTouch) {
             $('.custom-scroll').each(function() {
@@ -442,41 +356,7 @@
             });
         }
 
-        ///////////////////////////////////////////////////////////
-        // CALENDAR
-        $('.example-calendar-block').fullCalendar({
-            //aspectRatio: 2,
-            height: 450,
-            header: {
-                left: 'prev, next',
-                center: 'title',
-                right: 'month, agendaWeek, agendaDay'
-            },
-            buttonIcons: {
-                prev: 'none fa fa-arrow-left',
-                next: 'none fa fa-arrow-right',
-                prevYear: 'none fa fa-arrow-left',
-                nextYear: 'none fa fa-arrow-right'
-            },
-            editable: true,
-            eventLimit: true, // allow "more" link when too many events
-            viewRender: function(view, element) {
-                if (!cleanUI.hasTouch) {
-                    $('.fc-scroller').jScrollPane({
-                        autoReinitialise: true,
-                        autoReinitialiseDelay: 100
-                    });
-                }
-            },
-            defaultDate: '2017-07-20',
-            eventClick: function(calEvent, jsEvent, view) {
-                if (!$(this).hasClass('event-clicked')) {
-                    $('.fc-event').removeClass('event-clicked');
-                    $(this).addClass('event-clicked');
-                }
-            }
-        });
-
+    
         ///////////////////////////////////////////////////////////
         // CAROUSEL WIDGET
         $('.carousel-widget').carousel({
@@ -493,53 +373,6 @@
             responsive: true,
             "lengthMenu": [[5, 25, 50, -1], [5, 25, 50, "All"]]
         });
-
-        ///////////////////////////////////////////////////////////
-        // CHART 1
-        new Chartist.Line(".chart-line", {
-            labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            series: [
-                [12, 9, 7, 8, 5],
-                [2, 1, 3.5, 7, 3],
-                [1, 3, 4, 5, 6]
-            ]
-        }, {
-            fullWidth: !0,
-            chartPadding: {
-                right: 40
-            },
-            plugins: [
-                Chartist.plugins.tooltip()
-            ]
-        });
-
-        ///////////////////////////////////////////////////////////
-        // CHART 2
-        var overlappingData = {
-                    labels: ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                    series: [
-                        [5, 4, 3, 7, 5, 10, 3, 4, 8, 10, 6, 8],
-                        [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4]
-                    ]
-                },
-                overlappingOptions = {
-                    seriesBarDistance: 10,
-                    plugins: [
-                        Chartist.plugins.tooltip()
-                    ]
-                },
-                overlappingResponsiveOptions = [
-                    ["", {
-                        seriesBarDistance: 5,
-                        axisX: {
-                            labelInterpolationFnc: function(value) {
-                                return value[0]
-                            }
-                        }
-                    }]
-                ];
-
-        new Chartist.Bar(".chart-overlapping-bar", overlappingData, overlappingOptions, overlappingResponsiveOptions);
 
 
     });

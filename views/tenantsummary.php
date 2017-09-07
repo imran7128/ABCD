@@ -5,37 +5,10 @@
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $tenant_selected_id = 0;
-    if(isset($_POST['deleteTenant'])){
-        $sql = "SELECT uid FROM _tenantrentinginformation WHERE tid = '".$tenant_selected_id."'";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        $sql = "DELETE * FROM _tenantrentinginformation WHERE tid = '".$tenant_selected_id."'";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-
-        $sql = "SELECT currentTenant FROM _unit WHERE uid = '".$result['uid']."'";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $currentTenant = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        $sql = "UPDATE _unit SET currentTenant = :currentTenant WHERE uid = '".$result['uid']."'";
-        $stmt = $conn->prepare($sql);
-        $currentTenant['currentTenant'] -= 1;
-        $stmt->bindParam("currentTenant", $currentTenant);
-        $stmt->execute();
-
-        $sql = "DELETE * FROM _bill WHERE tid = '".$tenant_selected_id."'";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-
-        $sql = "DELETE * FROM _payments WHERE tid = '".$tenant_selected_id."'";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-
+    if(isset($_POST['did'])){
+        header("location: bill.php");
     }
-    if(isset($_POST['submit'])){
+    if(isset($_POST['firstName'])){
         $firstName = $_POST['firstName'];
         $lastName = $_POST['lastName'];
         $address = $_POST['address'];
@@ -67,8 +40,6 @@
         $stmt->bindParam("guardianContact",$guardianContact);
         $stmt->bindParam("id",$id);
         $stmt->execute();
-
-
     }
     include('head.php'); 
  ?>
@@ -436,6 +407,25 @@
         {   
            $("#formodal").html(result);
            $('#tview').modal('show');
+        }               
+    });
+        
+    }
+
+    function deleteT(selectedTenant){
+        var tid = selectedTenant;
+        $.ajax
+    ({
+        url: "../controllers/deleteT.php",
+        type:'POST',
+        data:
+        {
+            tid: tid
+        },
+        success: function(result)
+        {   
+           alert(result);
+           location.reload();
         }               
     });
         
