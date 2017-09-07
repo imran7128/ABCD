@@ -151,7 +151,7 @@
                                 <div class="messaging-list-title-name">'.$result['firstName'].' '.$result['lastName'].'</div>
                                     <div class="messaging-list-title-last color-default"></div>
                                 </div>
-                            </div>';
+                             </div>';
                 }
             ?>
 

@@ -3,18 +3,18 @@
     if($_POST){
         $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = "SELECT COUNT(*), id, first_name FROM `_owner` WHERE username = :username AND password = :password";
-        
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':password', $password);
 
-        $username = $_POST['username'];
-        $password = $_POST['password'];
+        $salt = "imranimranhussain";
+        $password = md5($salt.$_POST['password']);
+
+        $sql = "SELECT id,username, password, first_name FROM `_owner` WHERE username = :username AND password = :password";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':username', $_POST['username']);
+        $stmt->bindParam(':password', $password);
         $stmt->execute();
         $row=$stmt->fetch(PDO::FETCH_ASSOC);
 
-       if($row['id'] != 0) {
+        if($row['username'] == $_POST['username'] && $row['password'] == $password){
             session_start();
             session_id();
             $_SESSION['current_user'] = $_POST['username'];
@@ -25,8 +25,27 @@
             $_SESSION['foor_id'] = 'undefined';
             $_SESSION['floor_delete_by_user'] = 'undefined';
             header("location: index.php");
+        }
+
+        else{
+            $sql = "SELECT _tenantprofile.id as id, _tenantrentinginformation.uid as uid FROM _tenantprofile INNER JOIN _tenantrentinginformation ON _tenantrentinginformation.tid = _tenantprofile.id WHERE username = :username AND password = :password";
+
+            $salt = "imranimranhussain";
+            $password = md5($salt.$_POST['password']);
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':username', $_POST['username']);
+            $stmt->bindParam(':password', $password);
+            $stmt->execute();
+            $row=$stmt->fetch(PDO::FETCH_ASSOC);
+
+            if($row['username'] == $_POST['username'] && $row['password'] == $password){
+                session_start();
+                session_id();
+                $_SESSION['id'] = $row['id'];
+                header("location: tenant/tenantmain.php");
             }
         }
+    }
 ?>
 <?php
     include ('head.php');
@@ -79,12 +98,7 @@
                     </div>
                     <div class="form-group">
                         <a href="javascript: void(0);" class="pull-right">Forgot Password?</a>
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" name="example6" checked>
-                                Remember me
-                            </label>
-                        </div>
+
                     </div>
                     <div class="form-actions" name="submit">
                         <button type="submit" class="btn btn-primary width-150">Sign In</button>

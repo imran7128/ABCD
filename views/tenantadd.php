@@ -61,7 +61,7 @@
             $password = $result['password'];
     }
 
-    if(isset($_POST['firstName'])){
+    if(isset($_POST['firstName']) && $_POST['totalMonth'] != 0 && $_POST['aRPMt'] > 0){
         $totalMonths = $_POST['totalMonth'];
         $balance = 0;//$_POST['totalMRent'];
         $additionalPayment = $_POST['addPayment'];
@@ -74,7 +74,7 @@
 
         if(!isset($_GET['tid'])){
             $userName = $firstName.$_SESSION['id'];
-            $password = $lastName.$_SESSION['id'];
+            $password = md5($salt.$lastName.$_SESSION['id']);
         }
         
         $address= $_POST['address'];
@@ -398,14 +398,12 @@
         <div class="menu-user-block">
             <div class="dropdown dropdown-avatar">
                 <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <span class="avatar" href="javascript:void(0);">
-                        <img src="../assets/common/img/temp/avatars/1.jpg" alt="Alternative text to the image">
-                    </span>
+                    Welcome, <?php echo $_SESSION['current_user_first_name'];?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="" role="menu">
                     <a class="dropdown-item" href="javascript:void(0)"><i class="dropdown-icon icmn-user"></i> Profile</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="javascript:void(0)"><i class="dropdown-icon icmn-exit"></i> Logout</a>
+                    <a class="dropdown-item" href="logout.php"><i class="dropdown-icon icmn-exit"></i> Logout</a>
                 </ul>
             </div>
         </div>
@@ -731,10 +729,8 @@
         a = parseInt(runningTotal.value) + parseInt(addP.value);
         b = a - parseInt(disc.value) - parseInt(dp.value);
         var total = parseFloat(b/parseInt(totalMonth.value));
-        alert(total);
+
         var selbox = document.mainf.aRPM;
-        console.log(a + "a");
-        console.log(b + "b");
         $.ajax
         ({
             type: "POST",
@@ -820,7 +816,6 @@
                 var timeDifference = date2_unixtime - date1_unixtime;
                 var timeDifferenceInHours = timeDifference / 60 / 60;
                 var timeDifferenceInDays = timeDifferenceInHours  / 24;
-                console.log(timeDifferenceInDays);
 
 
                 var quotient = Math.floor(timeDifferenceInDays/30);
@@ -828,8 +823,7 @@
                 var t = document.getElementById('rentamt');
                 var totalPayment = quotient * t.value;
                 var rentPerMonth = Math.floor(totalPayment/quotient);
-                console.log(totalPayment + "total amount");
-                console.log(t.value + "total rentamt");
+
                 //alert("The tenant will have "+quotient+" paying months with "+remainder+" days to spare");
                 $('#aRPMt').val(rentPerMonth);                
                 $('#totalMonth').val(quotient);

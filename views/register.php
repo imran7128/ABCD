@@ -9,6 +9,7 @@
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(':username', $username);
                 $stmt->bindParam(':email', $email);
+                $password = md5($salt.$_POST['password']);
                 $stmt->bindParam(':password', $password);
                 $stmt->bindParam(':first_name', $first_name);
                 $stmt->bindParam(':last_name', $last_name);
@@ -17,12 +18,12 @@
 
                 $username = $_POST['username'];
                 $email = $_POST['email'];
-                $password = $_POST['password'];
                 $first_name = $_POST['first_name'];
                 $last_name = $_POST['last_name'];
                 $security_question = $_POST['security_question'];
                 $security_answer = $_POST['security_answer'];
                 $stmt->execute();
+                header("location: login.php");
             }
 ?>
 

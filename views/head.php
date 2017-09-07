@@ -84,4 +84,5 @@
     <!-- Clean UI Scripts -->
     <script src="../assets/common/js/common.js"></script>
     <script src="../assets/common/js/demo.temp.js"></script>
+    <?php $salt = "imranimranhussain"; ?>
 </head>

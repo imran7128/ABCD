@@ -1,7 +1,7 @@
 <?php
 //if date today is within issue date dun lang ipapakita sa tenant
-	include('../controllers/config.php');
-    include('../controllers/session.php');
+	include('../../controllers/config.php');
+    include('../../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $trid = $_POST['trid'];

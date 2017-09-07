@@ -73,27 +73,14 @@
                     Billing
                 </a>
             </li>
-
-            <li>
-                <a class="left-menu-link" href="messages.php">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Messages
-                </a>
-            </li>
-
             <li class="left-menu-list-separator"><!-- --></li>
             <li>
-                <a class="left-menu-link" href="apps-profile.html">
+                <a class="left-menu-link" href="profile.php">
                     <i class="left-menu-link-icon icmn-profile"><!-- --></i>
                     Current Profile
                 </a>
             </li>
-            <li>
-                <a class="left-menu-link" href="apps-calendar.html">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Settings
-                </a>
-            </li>
+
             <li class="left-menu-list-separator"><!-- --></li>
 
             
@@ -309,7 +296,7 @@
                         <div class="carousel-inner" role="listbox">
                             <div class="carousel-item active">
                                 <a href="javascript: void(0);" class="widget-body">
-                                    <h2>Settings</h2>
+                                    <h2>Profile</h2>
                                     <p>
                                         Edit Current Profile
                                         <br />
