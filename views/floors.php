@@ -12,8 +12,7 @@
         $f = 'location: ../controllers/deleteFloor.php?fid='.$_GET['fid'];
         header($f);
     }
-    if(isset($_POST['submit'])){
-
+    if($_POST){
         $sql = "INSERT INTO `_floor` (floorName, oid) VALUES (:floor, :id)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':floor', $_POST['floorNumber']);
@@ -200,12 +199,12 @@
                         <h4>Floors</h4>
                         <br />
                         <!-- Vertical Form -->
-                        <form method="POST" action="floors.php">
+                        <form method="POST" name="mainf" id="mainf">
                             <div class="row">
                                 <div class="col-lg-3">
                                     <div class="form-group">
                                         <label for="l30">Add Floor</label>
-                                        <input type="text" class="form-control" placeholder="Floor Name" id="floorNo" name="floorNumber">
+                                        <input type="text" class="form-control" placeholder="Floor Name" id="floorNo" name="floorNumber" data-validation="[NOTEMPTY]">
                                     </div>
                                     <div class="alert alert-danger" role="alert">
                                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -215,7 +214,7 @@
                                     </div>
                                     <div class="form-actions">
                                         <div class="col-lg-12">
-                                            <button type="submit" class="btn btn-primary width-100" name="submit">Add</button>
+                                            <button type="submit" class="btn btn-primary width-100" >Add</button>
                                             <button type="button" class="btn btn-default width-100">Cancel</button>
                                         </div>                    
                                     </div>
@@ -303,6 +302,17 @@
     </section>
 </div>
 </section>
+<script type="text/javascript">
+    $('#mainf').validate({
+            submit: {
+                settings: {
+                    inputContainer: '.form-group',
+                    errorListClass: 'form-control-error',
+                    errorClass: 'has-danger'
+                }
+            }
+        });
+</script>
 <script type="text/javascript">
     var valuetodel;
     function launchModal(selectedValue){
