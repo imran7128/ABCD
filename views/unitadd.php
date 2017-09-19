@@ -99,70 +99,30 @@
                     </li>
                 </ul>
             </li>
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
+            <li>
+                <a class="left-menu-link" href="bill.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
                     Billing
                 </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Edit
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Payments Summary
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Current Collection
-                        </a>
-                    </li>                    
-                </ul>
-            </li>
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
-                    Notices
-                </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="tables-basic-tables.html">
-                            Summary
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="tables-datatables.html">
-                            Edit
-                        </a>
-                    </li>
-                </ul>
             </li>
             
             <li class="left-menu-list-separator"><!-- --></li>
-            <li>
-                <a class="left-menu-link" href="apps-profile.html">
-                    <i class="left-menu-link-icon icmn-profile"><!-- --></i>
+            <li class="left-menu-list-submenu">
+                <a class="left-menu-link" href="javascript: void(0);">
                     Current Profile
                 </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-messaging.html">
-                    <i class="left-menu-link-icon icmn-bubbles5"><!-- --></i>
-                    Messaging
-                </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-calendar.html">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Calendar
-                </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-calendar.html">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Settings
-                </a>
+                <ul class="left-menu-list list-unstyled">
+                    <li>
+                        <a class="left-menu-link" href="profile.php">
+                            Update Information
+                        </a>
+                    </li>
+                    <li>
+                        <a class="left-menu-link" href="profilepass.php">
+                            Change Password
+                        </a>
+                    </li>
+                </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
 

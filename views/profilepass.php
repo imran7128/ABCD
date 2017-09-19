@@ -3,50 +3,27 @@
     include('../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    include('head.php');
 
-    $sql = "SELECT username, email, first_name, last_name, contactNumber from _owner WHERE id = :id";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':id',$_SESSION['id']);
-    $stmt->execute();
-    $result=$stmt->fetch(PDO::FETCH_ASSOC);
-    $_SESSION['allow_change_pass'] = 'false';
-   
-   if($_POST){
-        $sql = "UPDATE _owner SET userName = :username, email = :email, first_name = :first_name, last_name = :last_name, contactNumber = :cellphone WHERE id = '".$_SESSION['id']."'";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam("username", $_POST['username']);
-        $stmt->bindParam("first_name", $_POST['first_name']);
-        $stmt->bindParam("last_name", $_POST['last_name']);
-        $stmt->bindParam("email", $_POST['email']);
-        $stmt->bindParam("cellphone", $_POST['contactNumber']);
-        if($stmt->execute()){
-                $_SESSION['usuccess'] = 'success';
-                $_SESSION['allow_change_pass'] = 'false';
-                header("location: profile.php");
+    if(isset($_POST['password'])){
+        if($_POST['password'] != $_POST['confirmpassword']){
+            $_SESSION['usuccess'] == 'notmatch';
+        }
+        else{
+            $password = md5($salt.$_POST['password']);
+            $sql = "UPDATE _owner SET password = :pass";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':pass', $password);
+            if($stmt->execute()){
+                $_SESSION['usuccess'] == 'success';
             }
             else{
-                $_SESSION['usuccess'] = 'fail';
-                $_SESSION['allow_change_pass'] = 'false';
-
+                $_SESSION['usuccess'] == 'fail';
             }
-        
-        if($_SESSION['allow_change_pass'] = 'true'){
-            $salt = "imranimranhussain";
-            $pass = md5($salt.$_POST['password']);
-            $sql = "UPDATE _owner SET password = :pass WHERE id = '".$_SESSION['id']."'";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam("pass", $pass);
-            if($stmt->execute()){
-                    $_SESSION['usuccess'] = 'success';
-                    header("location: profile.php");
-                }
-                else{
-                    $_SESSION['usuccess'] = 'fail';
-
-                }
-            }
-   }
-    include('head.php');
+        }
+        header('location: logout.php');
+    }
+    
 
 ?>
 <body class="mode-default colorful-enabled theme-red">
@@ -168,7 +145,7 @@
     <!-- Basic Form Elements -->
     <section class="panel">
         <div class="panel-heading">
-            <h3>Current Profile</h3>
+            <h3>Change Password</h3>
         </div>
         <div class="panel-body">
             <div class="row">
@@ -179,53 +156,20 @@
                         <form  id="mainf" name="mainf" method="POST">
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l0">Username</label>
+                                    <label class="form-control-label" for="password">Password</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="User Name" id="l0" name="username" data-validation=[NOTEMPTY] value="<?php echo $result['username']?>">
+                                    <input type="password" class="form-control" placeholder="Password" id="password" name="password" data-validation=[NOTEMPTY] value="">
                                 </div>
                             </div>
                             
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l2">Email Address</label>
+                                    <label class="form-control-label" for="confirmpassword">Confirm Password</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">
-                                            <i class="icmn-mail2"></i>
-                                        </span>
-                                        <input type="email" class="form-control" placeholder="Email Address" id="l2" name="email" data-validation=[NOTEMPTY] value="<?php echo $result['email']?>">
-                                    </div>
+                                        <input type="password" class="form-control" placeholder="Confirm Password" id="confirmpassword" name="confirmpassword" data-validation=[NOTEMPTY] value="">
                                 </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="l0">First Name</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="First Name" id="l0" name="first_name" data-validation=[NOTEMPTY] value="<?php echo $result['first_name']?>">
-                                </div>
-                                </div>
-                                <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="l0">Last Name</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Last Name" id="l0" name="last_name" data-validation=[NOTEMPTY] value="<?php echo $result['last_name']?>">
-                            </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="l0">Cellphone Number</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" name="contactNumber" id="contactNumber" value="<?php echo $result['contactNumber']?>">
-                                        <small class="text-muted">Phone number input: (0999) 123-4567</small>
-                                </div>
-                                <section name="pass" id="pass"></section>
-
-
                             </div>
                             <div class="form-actions">
                                 <div class="form-group row">
@@ -255,11 +199,6 @@
                 }
             }
         });
-</script>
-<script>
-    $(function() {
-        $('#contactNumber').mask('(0000) 000-0000', {placeholder: "(____) ___-____"});
-    });
 </script>
 <?php
     if($_SESSION['usuccess'] == 'success'){

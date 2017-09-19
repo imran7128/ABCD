@@ -8,39 +8,7 @@
     if(isset($_POST['did'])){
         header("location: bill.php");
     }
-    if(isset($_POST['firstName'])){
-        $firstName = $_POST['firstName'];
-        $lastName = $_POST['lastName'];
-        $address = $_POST['address'];
-        $email = $_POST['email'];
-        $contactNumber = $_POST['contactNumber'];
-        $guardianName = $_POST['guardianName'];
-        $guardianAddress = $_POST['guardianAddress'];
-        $guardianContact = $_POST['guardianContact'];
-        $id = $_POST['id'];
-
-        $sql = "UPDATE _tenantprofile SET 
-        firstName = :firstName, 
-        lastName = :lastName,
-        address = :address,
-        email = :email,
-        contactNumber = :contactNumber,
-        guardianName = :guardianName,
-        guardianAddress = :guardianAddress,
-        guardianContact = :guardianContact
-        WHERE id = :id";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam("firstName",$firstName);
-        $stmt->bindParam("lastName",$lastName);
-        $stmt->bindParam("address",$address);
-        $stmt->bindParam("email",$email);
-        $stmt->bindParam("contactNumber",$contactNumber);
-        $stmt->bindParam("guardianName",$guardianName);
-        $stmt->bindParam("guardianAddress",$guardianAddress);
-        $stmt->bindParam("guardianContact",$guardianContact);
-        $stmt->bindParam("id",$id);
-        $stmt->execute();
-    }
+    
     include('head.php'); 
  ?>
 <body class="mode-default colorful-enabled theme-red">
@@ -104,70 +72,30 @@
                     </li>
                 </ul>
             </li>
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
+            <li>
+                <a class="left-menu-link" href="bill.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
                     Billing
                 </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Edit
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Payments Summary
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Current Collection
-                        </a>
-                    </li>                    
-                </ul>
-            </li>
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
-                    Notices
-                </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="tables-basic-tables.html">
-                            Summary
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="tables-datatables.html">
-                            Edit
-                        </a>
-                    </li>
-                </ul>
             </li>
             
             <li class="left-menu-list-separator"><!-- --></li>
-            <li>
-                <a class="left-menu-link" href="apps-profile.html">
-                    <i class="left-menu-link-icon icmn-profile"><!-- --></i>
+            <li class="left-menu-list-submenu">
+                <a class="left-menu-link" href="javascript: void(0);">
                     Current Profile
                 </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-messaging.html">
-                    <i class="left-menu-link-icon icmn-bubbles5"><!-- --></i>
-                    Messaging
-                </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-calendar.html">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Calendar
-                </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-calendar.html">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Settings
-                </a>
+                <ul class="left-menu-list list-unstyled">
+                    <li>
+                        <a class="left-menu-link" href="profile.php">
+                            Update Information
+                        </a>
+                    </li>
+                    <li>
+                        <a class="left-menu-link" href="profilepass.php">
+                            Change Password
+                        </a>
+                    </li>
+                </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
 
@@ -346,7 +274,108 @@
             </div>
         </div>
     </section>
-    <section name="formodal" id="formodal"></section>
+    <section name="formodal" id="formodal">
+        <div class="modal fade" id="tview" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">Profile Information</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form name="tenant" id="tenant" method="POST">
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">ID</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="id" id="l0" name="id" data-validation=[NOTEMPTY] readonly="" value="'.$result['id'].'">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">First Name</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="First Name" id="l0" name="fName" data-validation=[NOTEMPTY] value="'.$result['firstName'].'">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">Last Name</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="Last Name" id="l0" name="lName" data-validation=[NOTEMPTY] value="'.$result['lastName'].'">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">Address</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="Address" id="l0" name="address" data-validation=[NOTEMPTY] value="'.$result['address'].'">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">Email</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="Email" id="l0" name="email" data-validation=[EMAIL] value="'.$result['email'].'">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">Contact Number</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="Contact Number" id="l0" name="contactNumber" data-validation=[NOTEMPTY] value="'.$result['contactNumber'].'">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">Guardian Name</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="First Name" id="l0" name="guardianName" data-validation=[NOTEMPTY] value="'.$result['guardianName'].'">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">Guardian Address</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="First Name" id="l0" name="guardianAddress" data-validation=[NOTEMPTY] value="'.$result['guardianAddress'].'">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">Guardian Contact Number</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="First Name" id="l0" name="guardianContact" data-validation=[NOTEMPTY] value="'.$result['guardianContact'].'">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>'
+    </section>
     <!-- End  -->
 
 </div>
@@ -390,6 +419,38 @@
 
     }
     */
+    function updatetenant(){
+        var id = $('#id').val();
+        var fName = $('#fName').val();
+        var lName = $('#lName').val();
+        var email = $('#email').val();
+        var address = $('#address').val();
+        var contactNumber = $('#contactNumber').val();
+        var guardianName = $('#guardianName').val();
+        var guardianAddress = $('#guardianAddress').val();
+        var guardianContact = $('#guardianContact').val();
+
+        $.ajax({
+            url: "../controllers/tenantupdate.php",
+            type: 'POST',
+            data:
+            {
+                id: id, fName: fName, lName: lName, email: email, address: address, contactNumber: contactNumber,
+                guardianName: guardianName, guardianContact: guardianContact, guardianAddress: guardianAddress
+            },
+            success: function(){
+                $('#tview').modal('hide');
+                swal({
+                title: "All done!",
+                text: "Tenant information updated successfully",
+                type: "success",
+                confirmButtonClass: "btn-success",
+                confirmButtonText: "Success"
+                });  
+
+            }
+        });
+    }
 
     function deleteTenant(selectedTenant){
         var tid = selectedTenant;

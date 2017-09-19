@@ -75,7 +75,7 @@
                 $stmt2->bindParam(':date', $date);
                 $stmt2->execute();
                 $currentpayment = 0;
-                break;
+                //break;
             }
             if($currentpayment > $currentbilltotal){
                 while($currentpayment >= $currentbilltotal){

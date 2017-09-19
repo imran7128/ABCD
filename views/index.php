@@ -47,6 +47,11 @@
                             Add Unit
                         </a>
                     </li>
+                    <li>
+                        <a class="left-menu-link" href="unitedit.php">
+                            Edit Unit
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
@@ -74,11 +79,22 @@
                 </a>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
-            <li>
-                <a class="left-menu-link" href="profile.php">
-                    <i class="left-menu-link-icon icmn-profile"><!-- --></i>
+            <li class="left-menu-list-submenu">
+                <a class="left-menu-link" href="javascript: void(0);">
                     Current Profile
                 </a>
+                <ul class="left-menu-list list-unstyled">
+                    <li>
+                        <a class="left-menu-link" href="profile.php">
+                            Update Information
+                        </a>
+                    </li>
+                    <li>
+                        <a class="left-menu-link" href="profilepass.php">
+                            Change Password
+                        </a>
+                    </li>
+                </ul>
             </li>
 
             <li class="left-menu-list-separator"><!-- --></li>

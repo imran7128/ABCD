@@ -1,7 +1,7 @@
 <?php
 //if date today is within issue date dun lang ipapakita sa tenant
-	include('../controllers/config.php');
-    include('../controllers/session.php');
+	include('config.php');
+    include('session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $trid = $_POST['trid'];
@@ -184,7 +184,7 @@
                                         $ss->execute();
                                         $ssb = $ss->fetch(PDO::FETCH_ASSOC);
                                         if($ssb['biamount'] != 0 || $ssb['biamount'] != null){
-                                            $subt += $ssb['bamount'] + $stbamt;
+                                            $subt += $ssb['biamount'] + $stbamt;
                                         }
                                         else{
                                             $subt += $stbamt;
@@ -272,6 +272,10 @@
                         </div>
                     </div>
                     <div class="text-right">
+                     <button type="button" class="btn btn-primary" onclick="showmodal2();">
+                            <i class="icmn-checkmark margin-right-5"></i>
+                            Issue Payment
+                        </button>
                         <button type="button" class="btn btn-default" onclick="javascript:window.print();">
                             <i class="icmn-printer margin-right-5"></i>
                             Print

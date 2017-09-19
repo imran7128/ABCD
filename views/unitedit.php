@@ -4,14 +4,13 @@
     include('head.php'); 
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
  ?>
 <body class="mode-default colorful-enabled theme-red">
 <nav class="left-menu" left-menu>
     <div class="logo-container">
         <a href="index.html" class="logo">
             <img src="../assets/common/img/logo.png" alt="Clean UI Admin Template" />
-            <img class="logo-inverse" src="../assets/common/img/logo-inverse.png" alt="Clean UI Admin Template" />
+            <img class="logo-inverse" src="../assets/common/img/logo-inverse.png" alt="ABCD Logo" />
         </a>
     </div>
     <div class="left-menu-inner scroll-pane">
@@ -49,8 +48,8 @@
                         </a>
                     </li>
                     <li>
-                        <a class="left-menu-link" href="unitdelete.php">
-                            Delete Unit
+                        <a class="left-menu-link" href="unitedit.php">
+                            Edit Unit
                         </a>
                     </li>
                 </ul>
@@ -126,71 +125,11 @@
 </nav>
     
 <section class="page-content">
-<div class="page-content-inner">
-
-    <!--  -->
+<div class="page-content-inner">    
     <section class="panel">
         <div class="panel-heading">
             <h3>
-                Occupied Units
-            </h3>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-lg-12">
-                    <p>Units fully Occupied</p>
-                    <br />
-                    <div class="margin-bottom-50">
-                        <table class="table table-hover nowrap" id="tblActive" width="100%">
-                            <thead>
-                            <tr>
-                                <th>Floor</th>
-                                <th>Unit</th>
-                                <th>Rent Per Tenant</th>
-                                <th># of Tenants</th>
-                                <th>View Tenants</th>
-                            </tr>
-                            </thead>
-                            <tfoot>
-                            <tr>
-                                <th>Floor</th>
-                                <th>Unit</th>
-                                <th>Rent Per Tenant</th>
-                                <th># of Tenants</th>
-                                <th>View Tenants</th>
-                            </tr>
-                            </tfoot>
-                            <tbody>
-                            <tr>
-                                <?php
-                                   $sql = "SELECT _unit.id as uid, _floor.floorName AS floorName, _unit.unitName AS unitName, _unit.rentPerTenant as rent, _unit.currentTenant AS current FROM _floor INNER JOIN _unit ON _unit.floor_id = _floor.id WHERE _floor.oid = :id AND _unit.tenantAllowed = _unit.currentTenant";
-                                    $stmt = $conn->prepare($sql);
-                                    $stmt->bindParam(':id', $_SESSION['id']);
-                                    $stmt->execute();
-                                    while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
-                                        echo '<tr>';
-                                        echo '<td>'.$row['floorName'].'</td>';
-                                        echo '<td>'.$row['unitName'].'</td>';
-                                        echo '<td>'.$row['rent'].'</td>';
-                                        echo '<td>'.$row['current'].'</td>';
-                                        echo '<td><button class="btn btn-success" onclick="launchModal('.$row['uid'].');">View</td>';
-                                        echo '</tr>';
-                                    }
-                                    
-                                ?>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <section class="panel">
-        <div class="panel-heading">
-            <h3>
-                Available Units
+                Editable Units
             </h3>
         </div>
         <div class="panel-body">
@@ -204,20 +143,16 @@
                             <tr>
                                 <th>Floor</th>
                                 <th>Unit</th>
-                                <th>Rent Per Tenant</th>
-                                <th># of Tenants</th>
-                                <th>Available Renter</th>
-                                <th>Add Tenant</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
                             </tr>
                             </thead>
                             <tfoot>
                             <tr>
                                 <th>Floor</th>
                                 <th>Unit</th>
-                                <th>Rent Per Tenant</th>
-                                <th># of Tenants</th>
-                                <th>Available Renter</th>
-                                <th>Add Tenant</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
                             </tr>
                             </tfoot>
                             <tbody>
@@ -227,13 +162,12 @@
                                     $stmt->bindParam(':id', $_SESSION['id']);
                                     $stmt->execute();
                                     while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                                        $rowid = $row['uid'];
                                         echo '<tr>';
                                         echo '<td>'.$row['floorName'].'</td>';
                                         echo '<td>'.$row['unitName'].'</td>';
-                                        echo '<td>'.$row['rent'].'</td>';
-                                        echo '<td>'.$row['current'].'</td>';
-                                        echo '<td>'.$row['rentNum'].'</td>';
-                                        echo '<td><a class="icmn icmn-plus-circle2" href="tenantadd.php?uid='.htmlspecialchars($row['uid']).'&&fid='.htmlspecialchars($row['fid']).'"</td>';
+                                        echo '<td><button class="btn btn-warning" name="edit" id="edit" onclick= "edit('.$rowid.')";>Edit</button></td>';
+                                        echo '<td><button class="btn btn-danger" name="delete" id="delete" onclick= "deleteu('.$rowid.')";>Delete</button></td>';
                                         echo '</tr>';
                                     }
                             ?>
@@ -245,7 +179,54 @@
         </div>
     </section>
     <section name="formodal" id="formodal">
-        
+        <div class="modal fade" id="uedit" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">Edit Unit</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="l0">Unit Name</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" placeholder="Unit Name" id="unitNme" name="unitName" 
+                                    data-validation=[NOTEMPTY]>
+                                </div>
+                                </div>
+                                <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="l0">Tenant Allowed</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" placeholder="Number of tenants allowed" id="tenantAllowed" name="tenantAllowed" 
+                                    data-validation=[NOTEMPTY]>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="l0">Rent per Tenant</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" placeholder="Rent per tenant" id="tenantRent" name="tenantRent" 
+                                    data-validation=[NOTEMPTY]>
+                                </div>
+                            </div>
+                            </div>
+                            <form>
+                            <div class="modal-footer">
+                                <button type="button" class="btn" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" name="submit">Save Changes</button>
+
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                    </div>        
     </section>
     <!-- End  -->
 
@@ -253,12 +234,12 @@
 
 <!-- Page Scripts -->
 <script type="text/javascript">
-    function launchModal(selectedUnit){
+    function deleteu(selectedUnit){
 
         var uid = selectedUnit;
         $.ajax
     ({
-        url: "../controllers/viewtenant.php",
+        url: "../controllers/unitedit.php",
         type:'POST',
         data:
         {
@@ -266,8 +247,59 @@
         },
         success: function(result)
         {   
+           alert(result);
+           /*
+           swal({ 
+                title: "Deleted",
+                text: "Unit successfully deleted!",
+                type: "success" 
+            });
+    */
+           location.reload();
+        }               
+    });
+    }
+
+     function saveedit(){
+        var uid = document.getElementById("uid").value;;
+        var unitName= document.getElementById("unitName").value;
+        var tenantAllowed= document.getElementById("tenantAllowed").value;
+        var tenantRent= document.getElementById("tenantRent").value;
+        $.ajax
+    ({
+        url: "../controllers/unitsave.php",
+        type:'POST',
+        data:
+        {
+            uid: uid, unitName: unitName, tenantAllowed: tenantAllowed, tenantrent: tenantRent
+        },
+        success: function(result)
+        { 
+            location.reload();  
+          /* swal({ 
+                title: "Edited",
+                text: "Unit successfully edited!",
+                type: "success" 
+            });*/
+           
+        }               
+    });
+    }
+
+    function edit(selectedUnit){
+        var id = selectedUnit;
+        $.ajax
+    ({
+        url: "../controllers/unitedit.php",
+        type:'POST',
+        data:
+        {
+            id: id
+        },
+        success: function(result)
+        {   
            $("#formodal").html(result);
-           $('#tview').modal('show');
+           $('#uedit').modal('show');
         }               
     });
     }

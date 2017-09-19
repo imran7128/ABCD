@@ -15,16 +15,6 @@
     </div>
     <div class="left-menu-inner scroll-pane">
         <ul class="left-menu-list left-menu-list-root list-unstyled">
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-success"></span> All Good 
-                </div>
-            </li>
-            <li class="menu-top-hidden">
-                <div class="left-menu-item">
-                    <span class="donut donut-danger"></span> Sumting Wong
-                </div>
-            </li>
             <li class="left-menu-list-separator "><!-- --></li>
             <li>
                 <a class="left-menu-link" href="index.php">
@@ -59,7 +49,7 @@
                 </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
-            <li>
+            <li class="left-menu-list-submenu">
                 <a class="left-menu-link" href="javascript: void(0);">
                     Tenant Information
                 </a>
@@ -76,71 +66,31 @@
                     </li>
                 </ul>
             </li>
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
+            <li>
+                <a class="left-menu-link" href="bill.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
                     Billing
                 </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li class="left-menu-list-active">
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Add
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Payments Summary
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="components-calendar.html">
-                            Current Collection
-                        </a>
-                    </li>                    
-                </ul>
             </li>
+            <li class="left-menu-list-separator"><!-- --></li>
             <li class="left-menu-list-submenu">
                 <a class="left-menu-link" href="javascript: void(0);">
-                    Notices
+                    Current Profile
                 </a>
                 <ul class="left-menu-list list-unstyled">
                     <li>
-                        <a class="left-menu-link" href="tables-basic-tables.html">
-                            Summary
+                        <a class="left-menu-link" href="profile.php">
+                            Update Information
                         </a>
                     </li>
                     <li>
-                        <a class="left-menu-link" href="tables-datatables.html">
-                            Edit
+                        <a class="left-menu-link" href="profilepass.php">
+                            Change Password
                         </a>
                     </li>
                 </ul>
             </li>
             
-            <li class="left-menu-list-separator"><!-- --></li>
-            <li>
-                <a class="left-menu-link" href="apps-profile.html">
-                    <i class="left-menu-link-icon icmn-profile"><!-- --></i>
-                    Current Profile
-                </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-messaging.html">
-                    <i class="left-menu-link-icon icmn-bubbles5"><!-- --></i>
-                    Messaging
-                </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-calendar.html">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Calendar
-                </a>
-            </li>
-            <li>
-                <a class="left-menu-link" href="apps-calendar.html">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Settings
-                </a>
-            </li>
             <li class="left-menu-list-separator"><!-- --></li>
 
             

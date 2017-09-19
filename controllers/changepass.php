@@ -15,7 +15,7 @@
                                     <label class="form-control-label" for="l0">New Password</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="password" class="form-control" placeholder="New Password" id="l0" name="password" data-validation=[NOTEMPTY]>
+                                    <input type="password" class="form-control" placeholder="New Password" id="password" name="password" data-validation=[NOTEMPTY]>
                                 </div>
                             </div>';
 ?>

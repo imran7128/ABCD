@@ -22,7 +22,7 @@
         $sql = "UPDATE _unit SET currentTenant = :currentTenant WHERE uid = '".$result['uid']."'";
         $stmt = $conn->prepare($sql);
         $currentTenant['currentTenant'] -= 1;
-        $stmt->bindParam("currentTenant", $currentTenant);
+        $stmt->bindParam("currentTenant", $currentTenant['currentTenant']);
         $stmt->execute();
 
         $sql = "DELETE FROM _bill WHERE tid = '".$tenant_selected_id."'";

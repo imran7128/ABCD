@@ -1,6 +1,6 @@
 <?php
-	include('../controllers/config.php');
-    include('../controllers/session.php');
+	include('config.php');
+    include('session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
