@@ -66,17 +66,6 @@
                             Dormitory
                             <br />
                         </h4>
-                        <address>
-                            Address
-                            <br />
-                            Address
-                            <br />
-                            <abbr title="Mail">E-mail:</abbr>&nbsp;&nbsp;
-                            <br />
-                            <abbr title="Phone">Phone:</abbr>&nbsp;&nbsp;
-                            <br />
-                            <br />
-                        </address>
                     </div>
                     <div class="col-md-6 text-right">
                         <h4>'.$unit.'</h4>
@@ -200,11 +189,13 @@
                                                 $currentTotal = $bb['biamt'] + $st['bamt'];
                                                 $holder = $currentTotal - $diff;
                                                 $total -= $holder;
+                                                if($s['pamt'] != 0){
                                                 echo '<tr>';
                                                 echo '<td></td>';
                                                 echo ' <td class="text-left">Advanced Payment</td>';
                                                 echo '<td>Php ('.$holder.')</td>';
                                                 echo '</tr>';
+                                            }
                                                 $_SESSION['current_excess_payment'] = $holder;
                                                 //break;
                                             }
@@ -290,7 +281,8 @@
     }//end of current
 
     if(isset($_POST['pending'])){
-    	$sql ="SELECT id, date FROM _bill WHERE trid = :trid AND status = 'pending' ORDER BY id ASC";
+        $total = 0;
+    	$sql ="SELECT id, amount, date FROM _bill WHERE trid = :trid AND status = 'pending' ORDER BY id ASC";
     	$stmt =$conn->prepare($sql);
     	$stmt->bindParam(':trid', $trid);
     	$stmt->execute();
@@ -312,17 +304,6 @@
                             Dormitory
                             <br />
                         </h4>
-                        <address>
-                            Address
-                            <br />
-                            Address
-                            <br />
-                            <abbr title="Mail">E-mail:</abbr>&nbsp;&nbsp;
-                            <br />
-                            <abbr title="Phone">Phone:</abbr>&nbsp;&nbsp;
-                            <br />
-                            <br />
-                        </address>
                     </div>
                     <div class="col-md-6 text-right">
                         <h4>'.$unit.'</h4>
@@ -348,36 +329,47 @@
                         <table class="table table-hover text-right">
                             <thead>
                             <tr>
-                                <th class="text-center">#</th>
+                                <th width = "20"></th>
                                 <th>Description</th>
                                 <th class="text-right">Amount</th>
-                                <th class="text-right">Total</th>
                             </tr>
                             </thead>
-                            <tbody>
+                            <tbody>';
 
-                            <tr>
-                                <td class="text-center">1</td>
-                                <td class="text-left">Monthly Rent</td>
-                                <td>Php 75.00</td>
-                                <td>Php 2,152.00</td>
-                            </tr>
-                            </tbody>
+                                echo '<tr>';
+                                echo '<td></td>';
+                                echo '<td class="text-left">Monthly Rent</td>';
+                                echo '<td>Php '.$br['amount'].'</td>';
+                                echo '</tr>';
+                                $total += $br['amount'];
+
+
+                                $sql = "SELECT amount, description, id FROM _bill_items WHERE bid = '".$br['id']."'";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->execute();
+                                while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+                                    echo '<tr>';
+                                    echo '<td></td>';
+                                    echo '<td class="text-left">'.$result['description'].'</td>';
+                                    echo '<td>Php '.$result['amount'].'</td>';
+                                    echo '</tr>';
+                                    $total += $result['amount'];     
+                                }
+
+
+                            
+                           echo' </tbody>
                         </table>
                     </div>
                     <div class="text-right clearfix">
                         <div class="pull-right">
                             <p class="page-invoice-amount">
-                                <strong>Total: <span>Php</span></strong>
+                                <strong>Total: <span>Php '.$total.'</span></strong>
                             </p>
                             <br />
                         </div>
                     </div>
                     <div class="text-right">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="icmn-checkmark margin-right-5"></i>
-                            Proceed to payment
-                        </button>
                         <button type="button" class="btn btn-default" onclick="javascript:window.print();">
                             <i class="icmn-printer margin-right-5"></i>
                             Print
@@ -390,7 +382,8 @@
 		}//end of while
     }//end of pending
     if(isset($_POST['paid'])){
-    	$sql ="SELECT id, date FROM _bill WHERE trid = :trid AND status = 'paid' ORDER BY id ASC";
+    	$total = 0;
+        $sql ="SELECT id, amount, date FROM _bill WHERE trid = :trid AND status = 'paid' ORDER BY id ASC";
     	$stmt =$conn->prepare($sql);
     	$stmt->bindParam(':trid', $trid);
     	$stmt->execute();
@@ -412,17 +405,6 @@
                             Dormitory
                             <br />
                         </h4>
-                        <address>
-                            Address
-                            <br />
-                            Address
-                            <br />
-                            <abbr title="Mail">E-mail:</abbr>&nbsp;&nbsp;
-                            <br />
-                            <abbr title="Phone">Phone:</abbr>&nbsp;&nbsp;
-                            <br />
-                            <br />
-                        </address>
                     </div>
                     <div class="col-md-6 text-right">
                         <h4>'.$unit.'</h4>
@@ -448,36 +430,47 @@
                         <table class="table table-hover text-right">
                             <thead>
                             <tr>
-                                <th class="text-center">#</th>
+                                <th width = "20"></th>
                                 <th>Description</th>
                                 <th class="text-right">Amount</th>
-                                <th class="text-right">Total</th>
                             </tr>
                             </thead>
-                            <tbody>
+                            <tbody>';
 
-                            <tr>
-                                <td class="text-center">1</td>
-                                <td class="text-left">Monthly Rent</td>
-                                <td>Php 75.00</td>
-                                <td>Php 2,152.00</td>
-                            </tr>
-                            </tbody>
+                                echo '<tr>';
+                                echo '<td></td>';
+                                echo '<td class="text-left">Monthly Rent</td>';
+                                echo '<td>Php '.$br['amount'].'</td>';
+                                echo '</tr>';
+                                $total += $br['amount'];
+
+
+                                $sql = "SELECT amount, description, id FROM _bill_items WHERE bid = '".$br['id']."'";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->execute();
+                                while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+                                    echo '<tr>';
+                                    echo '<td></td>';
+                                    echo '<td class="text-left">'.$result['description'].'</td>';
+                                    echo '<td>Php '.$result['amount'].'</td>';
+                                    echo '</tr>';
+                                    $total += $result['amount'];     
+                                }
+
+
+                            
+                           echo' </tbody>
                         </table>
                     </div>
                     <div class="text-right clearfix">
                         <div class="pull-right">
                             <p class="page-invoice-amount">
-                                <strong>Total: <span>Php</span></strong>
+                                <strong>Total: <span>Php '.$total.'</span></strong>
                             </p>
                             <br />
                         </div>
                     </div>
                     <div class="text-right">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="icmn-checkmark margin-right-5"></i>
-                            Proceed to payment
-                        </button>
                         <button type="button" class="btn btn-default" onclick="javascript:window.print();">
                             <i class="icmn-printer margin-right-5"></i>
                             Print
@@ -490,7 +483,8 @@
 		}//end of while
     }//end of paid
     if(isset($_POST['unpaid'])){
-    	$sql ="SELECT id,date FROM _bill WHERE trid = :trid AND status = 'unpaid' ORDER BY id ASC";
+    	$total = 0;
+        $sql ="SELECT id,amount, date FROM _bill WHERE trid = :trid AND status = 'unpaid' ORDER BY id ASC";
     	$stmt =$conn->prepare($sql);
     	$stmt->bindParam(':trid', $trid);
     	$stmt->execute();
@@ -512,17 +506,6 @@
                             Dormitory
                             <br />
                         </h4>
-                        <address>
-                            Address
-                            <br />
-                            Address
-                            <br />
-                            <abbr title="Mail">E-mail:</abbr>&nbsp;&nbsp;
-                            <br />
-                            <abbr title="Phone">Phone:</abbr>&nbsp;&nbsp;
-                            <br />
-                            <br />
-                        </address>
                     </div>
                     <div class="col-md-6 text-right">
                         <h4>'.$unit.'</h4>
@@ -548,36 +531,47 @@
                         <table class="table table-hover text-right">
                             <thead>
                             <tr>
-                                <th class="text-center">#</th>
+                                <th width = "20"></th>
                                 <th>Description</th>
                                 <th class="text-right">Amount</th>
-                                <th class="text-right">Total</th>
                             </tr>
                             </thead>
-                            <tbody>
+                            <tbody>';
 
-                            <tr>
-                                <td class="text-center">1</td>
-                                <td class="text-left">Monthly Rent</td>
-                                <td>Php 75.00</td>
-                                <td>Php 2,152.00</td>
-                            </tr>
-                            </tbody>
+                                echo '<tr>';
+                                echo '<td></td>';
+                                echo '<td class="text-left">Monthly Rent</td>';
+                                echo '<td>Php '.$br['amount'].'</td>';
+                                echo '</tr>';
+                                $total += $br['amount'];
+
+
+                                $sql = "SELECT amount, description, id FROM _bill_items WHERE bid = '".$br['id']."'";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->execute();
+                                while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
+                                    echo '<tr>';
+                                    echo '<td></td>';
+                                    echo '<td class="text-left">'.$result['description'].'</td>';
+                                    echo '<td>Php '.$result['amount'].'</td>';
+                                    echo '</tr>';
+                                    $total += $result['amount'];     
+                                }
+
+
+                            
+                           echo' </tbody>
                         </table>
                     </div>
                     <div class="text-right clearfix">
                         <div class="pull-right">
                             <p class="page-invoice-amount">
-                                <strong>Total: <span>Php</span></strong>
+                                <strong>Total: <span>Php '.$total.'</span></strong>
                             </p>
                             <br />
                         </div>
                     </div>
                     <div class="text-right">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="icmn-checkmark margin-right-5"></i>
-                            Proceed to payment
-                        </button>
                         <button type="button" class="btn btn-default" onclick="javascript:window.print();">
                             <i class="icmn-printer margin-right-5"></i>
                             Print
@@ -590,7 +584,8 @@
 		}//end of while
     }//end of unpaid
     if(isset($_POST['all'])){
-    	$sql ="SELECT id,date FROM _bill WHERE trid = :trid ORDER BY id ASC";
+    	$total = 0;
+        $sql ="SELECT id,date FROM _bill WHERE trid = :trid ORDER BY id ASC";
     	$stmt = $conn->prepare($sql);
     	$stmt->bindParam(':trid', $trid);
     	$stmt->execute();
@@ -612,17 +607,6 @@
                             Dormitory
                             <br />
                         </h4>
-                        <address>
-                            Address
-                            <br />
-                            Address
-                            <br />
-                            <abbr title="Mail">E-mail:</abbr>&nbsp;&nbsp;
-                            <br />
-                            <abbr title="Phone">Phone:</abbr>&nbsp;&nbsp;
-                            <br />
-                            <br />
-                        </address>
                     </div>
                     <div class="col-md-6 text-right">
                         <h4>'.$unit.'</h4>

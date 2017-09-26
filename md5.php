@@ -2,7 +2,7 @@
 <body>
 <form method="POST">
 	<input type="password" name="pass" id="pass">
-	<button type="submit" name="submit">MD5</button>
+	<button type="submit" name="submit">Encrypt</button>
 </form>
 </body>
 <?php

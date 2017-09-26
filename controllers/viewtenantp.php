@@ -71,7 +71,8 @@ if($_POST['tid']){
                                 		</div>
                                 		<div class="col-md-9">
                                     		<input type="text" class="form-control" placeholder="Contact Number" id="contactNumber" name="contactNumber" data-validation=[NOTEMPTY] value="'.$result['contactNumber'].'">
-                                		</div>
+                                		    <small class="text-muted">Phone number input: (0999) 123-4567</small>
+                                        </div>
                             		</div>
 
                             		<div class="form-group row">
@@ -98,7 +99,8 @@ if($_POST['tid']){
                                 		</div>
                                 		<div class="col-md-9">
                                     		<input type="text" class="form-control" placeholder="First Name" id="guardianContact" name="guardianContact" data-validation=[NOTEMPTY] value="'.$result['guardianContact'].'">
-                                		</div>
+                                		    <small class="text-muted">Phone number input: (0999) 123-4567</small>
+                                        </div>
                             		</div>
                                 </form>
                             </div>

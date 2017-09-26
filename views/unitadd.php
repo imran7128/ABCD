@@ -79,6 +79,11 @@
                             Add Unit
                         </a>
                     </li>
+                    <li>
+                        <a class="left-menu-link" href="unitedit.php">
+                            Edit Unit
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
@@ -200,7 +205,7 @@
                                     <label class="form-control-label" for="l0">Tenants Allowed</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Number of Tenants" id="l0", name="tenantAllowed" data-validation=[NOTEMPTY]>
+                                    <input type="text" class="form-control" placeholder="Number of Tenants" id="tenantAllowed", name="tenantAllowed" data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
 
@@ -209,7 +214,7 @@
                                     <label class="form-control-label" for="l0">Rent per Tenant</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Rent per Tenant" id="l0", name="rentPerTenant" data-validation=[NOTEMPTY]>
+                                    <input type="text" class="form-control" placeholder="Rent per Tenant" id="rentPerTenant" name="rentPerTenant" data-validation=[NOTEMPTY]>
                                 </div>
                             </div>
 
@@ -284,6 +289,12 @@
             }
         });
 
+</script>
+<script>
+    $(function() {
+        $('#rentPerTenant').mask('000,000,000,000,000', {reverse: true});
+        $('#tenantAllowed').mask('000,000,000,000,000', {reverse: true});
+    });
 </script>
 <div class="main-backdrop"><!-- --></div>
 

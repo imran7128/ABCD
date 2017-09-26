@@ -3,7 +3,7 @@
     include('../../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "SELECT firstName, lastName FROM _tenantprofile WHERE id = '".$_SESSION['']."'";
+    $sql = "SELECT firstName, lastName FROM _tenantprofile WHERE id = '".$_SESSION['tid']."'";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $tenantname = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -13,26 +13,38 @@
 <body class="mode-default colorful-enabled theme-red">
 <nav class="left-menu" left-menu>
     <div class="logo-container">
-        <a href="index.html" class="logo">
-            <img src="../../assets/common/img/logo.png" alt="Clean UI Admin Template" />
+        <a href="tenantmain.php" class="logo">
+            <img src="../../assets/common/img/logo.png" alt="ABCD Logo" />
             <img class="logo-inverse" src="../../assets/common/img/logo-inverse.png" alt="ABCD" />
         </a>
     </div>
     <div class="left-menu-inner scroll-pane">
         <ul class="left-menu-list left-menu-list-root list-unstyled">
             <li class="left-menu-list-separator "><!-- --></li>
-            <li class="left-menu-lists-active">
-                <a class="left-menu-link" href="index.php">
+            <li class="left-menu-list-active">
+                <a class="left-menu-link" href="tenantmain.php">
                     <i class="left-menu-link-icon icmn-home2"><!-- --></i>
                     <span class="menu-top-hidden">Invoices</span>
                 </a>
             </li>
 
-            <li>
-                <a class="left-menu-link" href="apps-calendar.html">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Settings
+            <li class="left-menu-list-separator"><!-- --></li>
+            <li class="left-menu-list-submenu">
+                <a class="left-menu-link" href="javascript: void(0);">
+                    Current Profile
                 </a>
+                <ul class="left-menu-list list-unstyled">
+                    <li>
+                        <a class="left-menu-link" href="profile.php">
+                            Update Information
+                        </a>
+                    </li>
+                    <li>
+                        <a class="left-menu-link" href="profilepass.php">
+                            Change Password
+                        </a>
+                    </li>
+                </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
 
@@ -55,7 +67,7 @@
                 <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="" role="menu">
                     <a class="dropdown-item" href="javascript:void(0)"><i class="dropdown-icon icmn-user"></i> Profile</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="logout.php"><i class="dropdown-icon icmn-exit"></i> Logout</a>
+                    <a class="dropdown-item" href="../logout.php"><i class="dropdown-icon icmn-exit"></i> Logout</a>
                 </ul>
             </div>
         </div>
@@ -77,9 +89,6 @@
                         </button>
                         <button type="button" class="btn btn-success-outline" name="paid" onclick="setPaid();">
                         Paid
-                        </button>
-                        <button type="button" class="btn btn-success-outline" name="pending" onclick="setPending();">
-                        Pending
                         </button>
                     </div>
                 </div>
@@ -104,8 +113,8 @@
 </script>
 
 <script type="text/javascript">
-    var tiddata = <?php echo $_SESSION['id'];?>
-    var uiddata = <?php echo $_SESSION['uid'];?>
+    var tiddata = <?php echo $_SESSION['id'];?>;
+    var uiddata = <?php echo $_SESSION['uid'];?>;
     var pdata = '';
 
     function setUnpaid() {
@@ -146,6 +155,7 @@
             cache: false,
             success: function(result)
             {   
+                
                 $("#invoiceResult").html(result);
             } 
         });

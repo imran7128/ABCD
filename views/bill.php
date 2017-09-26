@@ -46,6 +46,11 @@
                             Add Unit
                         </a>
                     </li>
+                    <li>
+                        <a class="left-menu-link" href="unitedit.php">
+                            Edit Unit
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
@@ -168,9 +173,6 @@
                         </button>
                         <button type="button" class="btn btn-success-outline" name="pending" onclick="setPending();">
                         Pending
-                        </button>
-                        <button type="button" class="btn btn-success-outline" name="pending" onclick="setAll();">
-                        All
                         </button>
                     </div>
                 </div>
@@ -324,7 +326,7 @@
         },
         success: function(result)
         {   
-            alert(result);
+            //alert(result);
             $('#pay').modal('hide');
             //changepaid("1");
             current.click();

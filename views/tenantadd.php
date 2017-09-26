@@ -29,6 +29,7 @@
     $unitName = "";
     $startDate = "";
     $endDate = "";
+    $salt = "imranimranhussain";
 
     if(isset($_GET['tid'])){
         $sql = "SELECT
@@ -305,6 +306,11 @@
                             Add Tenant
                         </a>
                     </li>
+                    <li>
+                        <a class="left-menu-link" href="unitedit.php">
+                            Edit Unit
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li>
@@ -421,8 +427,9 @@
                                     <label class="form-control-label" for="l0">Cellphone Number</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Cellphone Number" id="l0" name="contactNumber"
+                                    <input type="text" class="form-control" placeholder="Cellphone Number" id="contactNumber" name="contactNumber"
                                     data-validation=[NOTEMPTY] value="<?php echo $contactNumber;?>">
+                                    <small class="text-muted">Phone number input: (0999) 123-4567</small>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -448,8 +455,9 @@
                                     <label class="form-control-label" for="l0">Parent/Guardian Contact No.</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Parent/Guardian Contact No." id="l0" name="guardianContact"
+                                    <input type="text" class="form-control" placeholder="Parent/Guardian Contact No." id="guardianContact" name="guardianContact"
                                     data-validation=[NOTEMPTY] value="<?php echo $guardianContact;?>">
+                                    <small class="text-muted">Phone number input: (0999) 123-4567</small>
                                 </div>
                             </div>
 
@@ -822,6 +830,18 @@
     $_SESSION['tsuccess'] = 'undefined';
     
 ?>
+<script>
+    $(function() {
+        $('#contactNumber').mask('(0000) 000-0000', {placeholder: "(____) ___-____"});
+        $('#guardianContact').mask('(0000) 000-0000', {placeholder: "(____) ___-____"});
+        //$('#aRPMt').mask('000,000,000,000,000', {reverse: true});
+        //$('#disc').mask('000,000,000,000,000', {reverse: true});
+        //$('#addPayment').mask('000,000,000,000,000', {reverse: true});
+        //$('#totalMRent').mask('000,000,000,000,000', {reverse: true});
+        //$('#downpayment').mask('000,000,000,000,000', {reverse: true});
+        //$('#rentamt').mask('000,000,000,000,000', {reverse: true});
+    });
+</script>
 <div class="main-backdrop"><!-- --></div>
 
 </body>

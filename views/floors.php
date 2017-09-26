@@ -13,18 +13,30 @@
         header($f);
     }
     if($_POST){
-        $sql = "INSERT INTO `_floor` (floorName, oid) VALUES (:floor, :id)";
+        $sql = "SELECT id FROM _floor WHERE floorName = :floor AND oid = :owner";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':floor', $_POST['floorNumber']);
-        $stmt->bindParam(':id', $_SESSION['id']);
-        if($stmt->execute()){
+        $stmt->bindParam(':owner', $_SESSION['id']);
+        $stmt->execute();
+        $row=$stmt->fetch(PDO::FETCH_ASSOC);
+        if($row == 0){
+            $sql = "INSERT INTO `_floor` (floorName, oid) VALUES (:floor, :id)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':floor', $_POST['floorNumber']);
+            $stmt->bindParam(':id', $_SESSION['id']);
+            if($stmt->execute()){
                 $_SESSION['usuccess'] = 'success';
             }
             else{
                 $_SESSION['usuccess'] = 'fail';
 
             }
+        }
+        else{
+            $_SESSION['usuccess'] == 'taken';
+        }
 
+        
         }
 
     include('head.php');
@@ -70,6 +82,11 @@
                     <li>
                         <a class="left-menu-link" href="unitadd.php">
                             Add Unit
+                        </a>
+                    </li>
+                    <li>
+                        <a class="left-menu-link" href="unitedit.php">
+                            Edit Unit
                         </a>
                     </li>
                 </ul>
@@ -322,6 +339,20 @@
         swal({ 
                 title: "Error",
                 text: "Server Problem, try again later.",
+                type: "error" 
+                //},
+                  //  function(){
+                  //  window.location.href = 'login.html';
+            });
+    </script>
+        <?php
+    }
+    if($_SESSION['usuccess'] == 'taken'){
+        ?>
+        <script type="text/javascript">
+        swal({ 
+                title: "Error",
+                text: "Floor name exists",
                 type: "error" 
                 //},
                   //  function(){

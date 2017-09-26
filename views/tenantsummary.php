@@ -52,6 +52,11 @@
                             Add Unit
                         </a>
                     </li>
+                    <li>
+                        <a class="left-menu-link" href="unitedit.php">
+                            Edit Unit
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
@@ -336,7 +341,8 @@
                                             <label class="form-control-label" for="l0">Contact Number</label>
                                         </div>
                                         <div class="col-md-9">
-                                            <input type="text" class="form-control" placeholder="Contact Number" id="l0" name="contactNumber" data-validation=[NOTEMPTY] value="'.$result['contactNumber'].'">
+                                            <input type="text" class="form-control" placeholder="Contact Number" id="contactNumber" name="contactNumber" data-validation=[NOTEMPTY] value="'.$result['contactNumber'].'">
+                                            <small class="text-muted">Phone number input: (0999) 123-4567</small>
                                         </div>
                                     </div>
 
@@ -363,7 +369,8 @@
                                             <label class="form-control-label" for="l0">Guardian Contact Number</label>
                                         </div>
                                         <div class="col-md-9">
-                                            <input type="text" class="form-control" placeholder="First Name" id="l0" name="guardianContact" data-validation=[NOTEMPTY] value="'.$result['guardianContact'].'">
+                                            <input type="text" class="form-control" placeholder="First Name" id="guardianContact" name="guardianContact" data-validation=[NOTEMPTY] value="'.$result['guardianContact'].'">
+                                            <small class="text-muted">Phone number input: (0999) 123-4567</small>
                                         </div>
                                     </div>
                                 </form>
@@ -483,7 +490,7 @@
         },
         success: function(result)
         {   
-           alert(result);
+           //alert(result);
            location.reload();
         }               
     });
@@ -511,6 +518,12 @@
             }
         });
 
+    });
+</script>
+<script>
+    $(function() {
+        $('#contactNumber').mask('(0000) 000-0000', {placeholder: "(____) ___-____"});
+        $('#guardianContact').mask('(0000) 000-0000', {placeholder: "(____) ___-____"});
     });
 </script>
 <!-- End Page Scripts -->

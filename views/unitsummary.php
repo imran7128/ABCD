@@ -10,8 +10,8 @@
 <nav class="left-menu" left-menu>
     <div class="logo-container">
         <a href="index.html" class="logo">
-            <img src="../assets/common/img/logo.png" alt="Clean UI Admin Template" />
-            <img class="logo-inverse" src="../assets/common/img/logo-inverse.png" alt="Clean UI Admin Template" />
+            <img src="../assets/common/img/logo.png" alt="ABCD Logo" />
+            <img class="logo-inverse" src="../assets/common/img/logo-inverse.png" alt="ABCD" />
         </a>
     </div>
     <div class="left-menu-inner scroll-pane">
@@ -49,8 +49,8 @@
                         </a>
                     </li>
                     <li>
-                        <a class="left-menu-link" href="unitdelete.php">
-                            Delete Unit
+                        <a class="left-menu-link" href="unitedit.php">
+                            Edit Unit
                         </a>
                     </li>
                 </ul>

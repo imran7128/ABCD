@@ -1,17 +1,22 @@
 <?php
-  	include('../controllers/config.php');
-    include('../controllers/session.php');
+  	include('../../controllers/config.php');
+    include('../../controllers/session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $sql = "SELECT firstName, lastName FROM _tenantprofile WHERE id = '".$_SESSION['tid']."'";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $tenantname = $stmt->fetch(PDO::FETCH_ASSOC);
     include('head.php');
 
     if(isset($_POST['password'])){
         if($_POST['password'] != $_POST['confirmpassword']){
             $_SESSION['usuccess'] == 'notmatch';
+            echo '<script>alert("Passwords do not match");</script>';
         }
         else{
             $password = md5($salt.$_POST['password']);
-            $sql = "UPDATE _owner SET password = :pass";
+            $sql = "UPDATE _tenantprofile SET password = :pass";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':pass', $password);
             if($stmt->execute()){
@@ -20,8 +25,9 @@
             else{
                 $_SESSION['usuccess'] == 'fail';
             }
+            header('location: ../logout.php');
         }
-        header('location: logout.php');
+        
     }
     
 
@@ -29,73 +35,18 @@
 <body class="mode-default colorful-enabled theme-red">
 <nav class="left-menu" left-menu>
     <div class="logo-container">
-        <a href="index.html" class="logo">
-            <img src="../assets/common/img/logo.png" alt="Clean UI Admin Template" />
-            <img class="logo-inverse" src="../assets/common/img/logo-inverse.png" alt="Clean UI Admin Template" />
+        <a href="tenantmain.php" class="logo">
+            <img src="../../assets/common/img/logo.png" alt="ABCD Logo" />
+            <img class="logo-inverse" src="../../assets/common/img/logo-inverse.png" alt="ABCD" />
         </a>
     </div>
     <div class="left-menu-inner scroll-pane">
         <ul class="left-menu-list left-menu-list-root list-unstyled">
             <li class="left-menu-list-separator "><!-- --></li>
             <li>
-                <a class="left-menu-link" href="index.php">
+                <a class="left-menu-link" href="tenantmain.php">
                     <i class="left-menu-link-icon icmn-home2"><!-- --></i>
-                    <span class="menu-top-hidden">Dashboard</span>
-                </a>
-            </li>
-                <li class="left-menu-list-separator"><!-- -->
-            </li>
-            <li>
-                <a class="left-menu-link" href="floors.php">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Floors
-                </a>
-            </li>
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
-                    <i class="left-menu-link-icon icmn-files-empty2"><!-- --></i>
-                    Unit Information
-                </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="unitsummary.php">
-                           Unit List
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="unitadd.php">
-                            Add Unit
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="unitedit.php">
-                            Edit Unit
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="left-menu-list-separator"><!-- --></li>
-            <li class="left-menu-list-submenu">
-                <a class="left-menu-link" href="javascript: void(0);">
-                    Tenant Information
-                </a>
-                <ul class="left-menu-list list-unstyled">
-                    <li>
-                        <a class="left-menu-link" href="tenantsummary.php">
-                            Tenant List
-                        </a>
-                    </li>
-                    <li>
-                        <a class="left-menu-link" href="tenantadd.php">
-                            Add Tenant
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li>
-                <a class="left-menu-link" href="bill.php">
-                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
-                    Billing
+                    <span class="menu-top-hidden">Invoices</span>
                 </a>
             </li>
 
@@ -133,12 +84,12 @@
         <div class="menu-user-block">
             <div class="dropdown dropdown-avatar">
                 <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    Welcome, <?php echo $_SESSION['current_user_first_name'];?>
+                    Welcome, <?php echo $tenantname['firstName'].' '.$tenantname['lastName'];?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="" role="menu">
                     <a class="dropdown-item" href="javascript:void(0)"><i class="dropdown-icon icmn-user"></i> Profile</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="logout.php"><i class="dropdown-icon icmn-exit"></i> Logout</a>
+                    <a class="dropdown-item" href="../logout.php"><i class="dropdown-icon icmn-exit"></i> Logout</a>
                 </ul>
             </div>
         </div>

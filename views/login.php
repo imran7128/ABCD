@@ -28,7 +28,8 @@
         }
 
         else{
-            $sql = "SELECT _tenantprofile.id as id, _tenantrentinginformation.uid as uid FROM _tenantprofile INNER JOIN _tenantrentinginformation ON _tenantrentinginformation.tid = _tenantprofile.id WHERE username = :username AND password = :password";
+            $sql = "SELECT _tenantrentinginformation.id as id, _tenantprofile.username as username, 
+            _tenantprofile.password as password, _tenantprofile.id as tid, _tenantrentinginformation.uid as uid FROM _tenantprofile INNER JOIN _tenantrentinginformation ON _tenantrentinginformation.tid = _tenantprofile.id WHERE username = :username AND password = :password";
 
             $salt = "imranimranhussain";
             $password = md5($salt.$_POST['password']);
@@ -42,6 +43,12 @@
                 session_start();
                 session_id();
                 $_SESSION['id'] = $row['id'];
+                $_SESSION['uid'] = $row['uid'];
+                $_SESSION['tid'] = $row['tid'];
+                $_SESSION['current_user'] = $row['id'];
+                $_SESSION['current_user_tenant'] = 'true';
+                $_SESSION['usuccess'] = 'undefined';
+                $_SESSION['tsuccess'] = 'undefined';
                 header("location: tenant/tenantmain.php");
             }
         }
