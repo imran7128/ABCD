@@ -1,57 +1,67 @@
 <?php
     include ('../controllers/config.php');
+    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     if($_POST){
-        $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $salt = "imranimranhussain";
-        $password = md5($salt.$_POST['password']);
-
-        $sql = "SELECT id,username, password, first_name FROM `_owner` WHERE username = :username AND password = :password";
+        $sql="SELECT password, id FROM _owner WHERE email = :email";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':username', $_POST['username']);
-        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(":email", $_POST['email']);
         $stmt->execute();
-        $row=$stmt->fetch(PDO::FETCH_ASSOC);
-
-        if($row['username'] == $_POST['username'] && $row['password'] == $password){
-            session_start();
-            session_id();
-            $_SESSION['current_user'] = $_POST['username'];
-            $_SESSION['current_user_first_name'] = $row['first_name'];
-            $_SESSION['id'] = $row['id'];
-            $_SESSION['usuccess'] = 'undefined';
-            $_SESSION['tsuccess'] = 'undefined';
-            $_SESSION['foor_id'] = 'undefined';
-            $_SESSION['floor_delete_by_user'] = 'undefined';
-            header("location: index.php");
+        $row = $stmt->rowCount();
+        if($row > 0){
+            
+            $txt = "You forgot your account credentials for ABCD. A request was made to recover your account.
+                    . Report has been received. Await for further instructions. Thank you!";
+            //send_mail("",$txt, "owner");
         }
-
         else{
-            $sql = "SELECT _tenantrentinginformation.id as id, _tenantprofile.username as username, 
-            _tenantprofile.password as password, _tenantprofile.id as tid, _tenantrentinginformation.uid as uid FROM _tenantprofile INNER JOIN _tenantrentinginformation ON _tenantrentinginformation.tid = _tenantprofile.id WHERE username = :username AND password = :password";
-
-            $salt = "imranimranhussain";
-            $password = md5($salt.$_POST['password']);
+             $sql="SELECT password, id FROM _tenantprofile WHERE email = :email";
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':username', $_POST['username']);
-            $stmt->bindParam(':password', $password);
+            $stmt->bindParam(":email", $_POST['email']);
             $stmt->execute();
-            $row=$stmt->fetch(PDO::FETCH_ASSOC);
-
-            if($row['username'] == $_POST['username'] && $row['password'] == $password){
-                session_start();
-                session_id();
-                $_SESSION['id'] = $row['id'];
-                $_SESSION['uid'] = $row['uid'];
-                $_SESSION['tid'] = $row['tid'];
-                $_SESSION['current_user'] = $row['id'];
-                $_SESSION['current_user_tenant'] = 'true';
-                $_SESSION['usuccess'] = 'undefined';
-                $_SESSION['tsuccess'] = 'undefined';
-                header("location: tenant/tenantmain.php");
+            $row = $stmt->rowCount();
+            if($row > 0){
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                updateTenantAccount($result['id']);
+                $link = "recover.php?recover=".$result['id']."";
+                $txt = "You forgot your account credentials for ABCD. A request was made to recover your account.
+                    To continue, proceed to this link. ".$link." . Thank you!";
+                header("location:" .$link);
+                //send_mail();
             }
         }
+    }
+    function updateTenantAccount($id){
+        include ('../controllers/config.php');
+        $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $sql = "UPDATE _tenantprofile SET password = 'imranimranimranhussain' WHERE id ='".$id."'";
+        $stmt = $conn->prepare($sql);
+        $stmt -> execute();
+    }
+    function send_mail($txt = "", $type = ""){
+        include ('../controllers/config.php');
+        $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $to = $_POST['email'];
+        $subject = "ABCD Account Recovery";
+        $txt = "";
+        $header = "From: account_reset@abcdormitory.com";
+        mail($to, $subject,$txt,$header);
+
+        if($type == "owner"){
+            $txt = "Owner with email ".$to." has requested account recovery";
+        }
+        else{
+            $txt = "Tenant with email ".$to." has requested account recovery";
+              
+        }
+        $to = "account_reset@abcdormitory.com";
+        $subject = "ABCD Account Recovery - Someone requested account recovery"; 
+        mail($to, $subject,$txt,$header);
+
+
+
     }
 ?>
 <?php
@@ -83,32 +93,25 @@
             <div class="single-page-block-form">
                 <h3 class="text-center">
                     <i class="icmn-enter margin-right-10"></i>
-                    Login
+                    Forgot Password
                 </h3>
                 <br />
                 <form id="form-validation" name="form-validation" method="POST">
                     <div class="form-group">
-                        <input id="validation-username[username]"
+                        <input id="email"
                                class="form-control"
-                               placeholder="Username"
-                               name="username"
+                               placeholder="Enter email address"
+                               value = ""
+                               name="email"
                                type="text"
-                               data-validation="[NOTEMPTY]">
+                               data-validation="[EMAIL]">
                     </div>
                     <div class="form-group">
-                        <input id="validation-password"
-                               class="form-control password"
-                               name="password"
-                               type="password" data-validation="[L>=6]"
-                               data-validation-message="$ must be at least 6 characters"
-                               placeholder="Password">
-                    </div>
-                    <div class="form-group">
-                        <a href="forgot.php" class="pull-right">Forgot Password?</a>
+                        <!--<a href="javascript: void(0);" class="pull-right">Forgot Password?</a>-->
 
                     </div>
                     <div class="form-actions" name="submit">
-                        <button type="submit" class="btn btn-primary width-150">Sign In</button>
+                        <button type="submit" class="btn btn-primary width-150">Retrieve Account</button>
                     </div>
                 </form>
             </div>

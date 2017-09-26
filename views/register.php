@@ -20,8 +20,8 @@
                 $email = $_POST['email'];
                 $first_name = $_POST['first_name'];
                 $last_name = $_POST['last_name'];
-                $security_question = $_POST['security_question'];
-                $security_answer = $_POST['security_answer'];
+                $security_question = "";//$_POST['security_question'];
+                $security_answer = "";//$_POST['security_answer'];
                 $stmt->execute();
                 header("location: login.php");
             }
@@ -101,7 +101,7 @@
                                 data-validation-message="$ must not be empty"
                                 placeholder="Last Name">
                     </div>
-                    <div class="form-group">
+                   <!-- <div class="form-group">
                         <input  id="_security_question"
                                 class="form-control"
                                 name="security_question" 
@@ -116,7 +116,7 @@
                                 type="text" data-validation="[L>=1]"
                                 data-validation-message="$ must not be empty"
                                 placeholder="Security Answer">
-                    </div>
+                    </div>-->
                    
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary width-150">Sign Up</button>

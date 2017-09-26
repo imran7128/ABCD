@@ -1,58 +1,11 @@
 <?php
     include ('../controllers/config.php');
-    if($_POST){
-        $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $salt = "imranimranhussain";
-        $password = md5($salt.$_POST['password']);
-
-        $sql = "SELECT id,username, password, first_name FROM `_owner` WHERE username = :username AND password = :password";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':username', $_POST['username']);
-        $stmt->bindParam(':password', $password);
-        $stmt->execute();
-        $row=$stmt->fetch(PDO::FETCH_ASSOC);
-
-        if($row['username'] == $_POST['username'] && $row['password'] == $password){
-            session_start();
-            session_id();
-            $_SESSION['current_user'] = $_POST['username'];
-            $_SESSION['current_user_first_name'] = $row['first_name'];
-            $_SESSION['id'] = $row['id'];
-            $_SESSION['usuccess'] = 'undefined';
-            $_SESSION['tsuccess'] = 'undefined';
-            $_SESSION['foor_id'] = 'undefined';
-            $_SESSION['floor_delete_by_user'] = 'undefined';
-            header("location: index.php");
-        }
-
-        else{
-            $sql = "SELECT _tenantrentinginformation.id as id, _tenantprofile.username as username, 
-            _tenantprofile.password as password, _tenantprofile.id as tid, _tenantrentinginformation.uid as uid FROM _tenantprofile INNER JOIN _tenantrentinginformation ON _tenantrentinginformation.tid = _tenantprofile.id WHERE username = :username AND password = :password";
-
-            $salt = "imranimranhussain";
-            $password = md5($salt.$_POST['password']);
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':username', $_POST['username']);
-            $stmt->bindParam(':password', $password);
-            $stmt->execute();
-            $row=$stmt->fetch(PDO::FETCH_ASSOC);
-
-            if($row['username'] == $_POST['username'] && $row['password'] == $password){
-                session_start();
-                session_id();
-                $_SESSION['id'] = $row['id'];
-                $_SESSION['uid'] = $row['uid'];
-                $_SESSION['tid'] = $row['tid'];
-                $_SESSION['current_user'] = $row['id'];
-                $_SESSION['current_user_tenant'] = 'true';
-                $_SESSION['usuccess'] = 'undefined';
-                $_SESSION['tsuccess'] = 'undefined';
-                header("location: tenant/tenantmain.php");
-            }
-        }
+    $id = $_GET['recover'];
+    if($_POST)
+    {
+        header("location: index.php");
     }
+    
 ?>
 <?php
     include ('head.php');
@@ -83,32 +36,31 @@
             <div class="single-page-block-form">
                 <h3 class="text-center">
                     <i class="icmn-enter margin-right-10"></i>
-                    Login
+                    Account Recovery
                 </h3>
                 <br />
-                <form id="form-validation" name="form-validation" method="POST">
+                <form id="recovery" name="recovery" method="POST">
                     <div class="form-group">
-                        <input id="validation-username[username]"
-                               class="form-control"
-                               placeholder="Username"
-                               name="username"
-                               type="text"
-                               data-validation="[NOTEMPTY]">
-                    </div>
-                    <div class="form-group">
-                        <input id="validation-password"
+                        <input id="pass"
                                class="form-control password"
-                               name="password"
+                               name="pass"
                                type="password" data-validation="[L>=6]"
                                data-validation-message="$ must be at least 6 characters"
                                placeholder="Password">
                     </div>
                     <div class="form-group">
-                        <a href="forgot.php" class="pull-right">Forgot Password?</a>
-
+                        <input id="confirm"
+                               class="form-control password"
+                               name="confirm"
+                               type="password" data-validation="[L>=6]"
+                               data-validation-message="$ must be at least 6 characters"
+                               placeholder="Confirm password">
+                    </div>
+                    <div class="form-group">
+                    <a href="login.php" class="pull-right">Login?</a>
                     </div>
                     <div class="form-actions" name="submit">
-                        <button type="submit" class="btn btn-primary width-150">Sign In</button>
+                        <button type="button" onclick="recover();" class="btn btn-primary width-150">Update Password</button>
                     </div>
                 </form>
             </div>
@@ -123,11 +75,37 @@
 
 <!-- Page Scripts -->
 <script>
+function recover(){
+    var id = <?php echo $id;?>;
+    var pass = document.getElementById('pass').value;
+    var confirmpass = document.getElementById('confirm').value;
+    if(pass!= confirmpass){
+        alert("Passwords do not match");
+    }
+    else
+    {
+        $.ajax
+    ({
+        url: "../controllers/recover.php",
+        type:'POST',
+        data:
+        {
+            id:id, pass:pass, confirmpass: confirmpass
+        },
+        success: function(result)
+        { 
+            alert("Success!");
+
+        }               
+    });
+}
+    }
+
     $(function() {
 
         // Form Validation
-        $('#form-validation').validate({
-            submit: {
+        $('#recovery').validate({
+            button: {
                 settings: {
                     inputContainer: '.form-group',
                     errorListClass: 'form-control-error',
@@ -137,7 +115,12 @@
         });
 
         // Show/Hide Password
-        $('.password').password({
+        $('.pass').password({
+            eyeClass: '',
+            eyeOpenClass: 'icmn-eye',
+            eyeCloseClass: 'icmn-eye-blocked'
+        });
+        $('.confirmpass').password({
             eyeClass: '',
             eyeOpenClass: 'icmn-eye',
             eyeCloseClass: 'icmn-eye-blocked'
@@ -187,8 +170,10 @@
         }
 
     });
+
 </script>
 <!-- End Page Scripts -->
+
 </section>
 
 <div class="main-backdrop"><!-- --></div>
