@@ -290,10 +290,10 @@
         });
 
 </script>
-<script>
+<script type="text/javascript">
     $(function() {
-        $('#rentPerTenant').mask('000,000,000,000,000', {reverse: true});
-        $('#tenantAllowed').mask('000,000,000,000,000', {reverse: true});
+        $('#rentPerTenant').mask('000,000,000,000,000.00', {reverse: true});
+        $('#tenantAllowed').mask('000,000,000,000,000.00', {reverse: true});
     });
 </script>
 <div class="main-backdrop"><!-- --></div>

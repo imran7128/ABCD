@@ -8,6 +8,8 @@
     	$sql = "DELETE FROM _unit WHERE id = '".$_POST['uid']."'";
     	$stmt = $conn->prepare($sql);
     	$stmt->execute();
+        $_SESSION['usuccess'] == 'deleted';
+
     }
 
     if(isset($_POST['id'])){

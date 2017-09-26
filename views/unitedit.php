@@ -4,6 +4,13 @@
     include('head.php'); 
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $_SESSION['unit_delete_by_user'] = 'undefined';
+    $url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+    $escaped_url = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' ); 
+    if(isset($_GET['uid'])){
+        $f = 'location: ../controllers/deleteUnit.php?uid='.$_GET['uid'];
+        header($f);
+    }
  ?>
 <body class="mode-default colorful-enabled theme-red">
 <nav class="left-menu" left-menu>
@@ -234,8 +241,27 @@
 
 <!-- Page Scripts -->
 <script type="text/javascript">
+var valuetodel = 0;
     function deleteu(selectedUnit){
-
+        valuetodel = selectedUnit;
+         swal({
+                title: "Are you sure?",
+                text: "Your will not be able to undo this!",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonClass: "btn-default",
+                confirmButtonClass: "btn-warning",
+                confirmButtonText: "Remove",
+                closeOnConfirm: false
+            },
+            function(){
+                <?php $_SESSION['unit_delete_by_user'] = 'true';?>
+                var uri = "<?php echo $escaped_url;?>";
+                var dest = uri.concat("?uid=",valuetodel);
+                window.location.replace(dest);
+            });
+    }
+/*
         var uid = selectedUnit;
         $.ajax
     ({
@@ -247,18 +273,17 @@
         },
         success: function(result)
         {   
-           alert(result);
+           //alert(result);
            /*
            swal({ 
                 title: "Deleted",
                 text: "Unit successfully deleted!",
                 type: "success" 
             });
-    */
-           location.reload();
+         location.reload();
         }               
     });
-    }
+    }*/ 
 
      function saveedit(){
         var uid = document.getElementById("uid").value;;
@@ -271,10 +296,11 @@
         type:'POST',
         data:
         {
-            uid: uid, unitName: unitName, tenantAllowed: tenantAllowed, tenantrent: tenantRent
+            uid: uid, unitName: unitName, tenantAllowed: tenantAllowed, tenantRent: tenantRent
         },
         success: function(result)
         { 
+            //alert(result);
             location.reload();  
           /* swal({ 
                 title: "Edited",
@@ -318,6 +344,50 @@
     });
 </script>
 <!-- End Page Scripts -->
+<?php
+    if($_SESSION['usuccess'] == 'success'){
+        $_SESSION['usuccess'] =='undefined';
+        ?>
+        <script type="text/javascript">
+        swal({
+                title: "All done!",
+                text: "Unit edited successfully",
+                type: "success",
+                confirmButtonClass: "btn-success",
+                confirmButtonText: "Success"
+            });
+    </script>
+    <?php
+    }
+    if($_SESSION['usuccess'] == 'fail'){
+        ?>
+        <script type="text/javascript">
+        swal({ 
+                title: "Error",
+                text: "Server Problem, try again later.",
+                type: "error" 
+                //},
+                  //  function(){
+                  //  window.location.href = 'login.html';
+            });
+    </script>
+        <?php
+    }
+    if($_SESSION['usuccess'] == 'deleted'){
+        $_SESSION['usuccess'] == 'undefined';
+        ?>
+        <script type="text/javascript">
+            swal({
+                    title: "Deleted!",
+                    text: "Unit has been deleted",
+                    type: "success",
+                    confirmButtonClass: "btn-success"
+                });           
+        </script><?php
+    }
+
+    $_SESSION['usuccess'] = 'undefined';
+?>
 </section>
 
 <div class="main-backdrop"><!-- --></div>

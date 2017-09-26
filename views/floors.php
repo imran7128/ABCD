@@ -302,7 +302,7 @@
         e.preventDefault();
             swal({
                 title: "Are you sure?",
-                text: "Your will not be able to recover this file!",
+                text: "Your will not be able to undo this!",
                 type: "warning",
                 showCancelButton: true,
                 cancelButtonClass: "btn-default",
@@ -366,7 +366,7 @@
         <script type="text/javascript">
             swal({
                     title: "Deleted!",
-                    text: "File has been deleted",
+                    text: "Floor has been deleted",
                     type: "success",
                     confirmButtonClass: "btn-success"
                 });           
