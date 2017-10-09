@@ -23,7 +23,7 @@
                 $security_question = "";//$_POST['security_question'];
                 $security_answer = "";//$_POST['security_answer'];
                 $stmt->execute();
-                header("location: login.php");
+               // header("location: login.php");
             }
 ?>
 
@@ -122,8 +122,8 @@
                         <button type="submit" class="btn btn-primary width-150">Sign Up</button>
                         <div class="checkbox margin-left-10">
                             <label>
-                                <input type="checkbox" name="example6" checked>
-                                Agree to Terms and Conditions
+                               <!-- <input type="checkbox" name="example6" checked>
+                                Agree to Terms and Conditions-->
                             </label>
                         </div>
                     </div>

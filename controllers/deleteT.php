@@ -10,7 +10,7 @@
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $sql = "DELETE FROM _tenantrentinginformation WHERE tid = '".$tenant_selected_id."'";
+        $sql = "UPDATE _tenantrentinginformation SET status = '0' WHERE tid = '".$tenant_selected_id."'";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
 
@@ -25,22 +25,26 @@
         $stmt->bindParam("currentTenant", $currentTenant['currentTenant']);
         $stmt->execute();
 
-        $sql = "SELECT id FROM _bill WHERE  tid = '".$tenant_selected_id."'";
+        
+        $sql = "SELECT id FROM _bill WHERE  tid = '".$tenant_selected_id."' AND status = 'pending'";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
             $sql = "DELETE FROM _bill_items WHERE bid = '".$result['id']."'";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
+            $stmtt = $conn->prepare($sql);
+            $stmtt->execute();
         }
 
-        $sql = "DELETE FROM _bill WHERE tid = '".$tenant_selected_id."'";
+        $sql = "DELETE FROM _bill WHERE tid = '".$tenant_selected_id."' AND status = 'pending'";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
 
+        /*
         $sql = "DELETE FROM _payments WHERE tid = '".$tenant_selected_id."'";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
+        */
+        
 
     }
 ?>

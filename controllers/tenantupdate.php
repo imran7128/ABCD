@@ -13,6 +13,8 @@
         $guardianAddress = $_POST['guardianAddress'];
         $guardianContact = $_POST['guardianContact'];
         $id = $_POST['id'];
+        $gender = $_POST['gender'];
+        $civil = $_POST['civil']''
 
         $sql = "UPDATE _tenantprofile SET 
         firstName = :firstName, 
@@ -22,7 +24,9 @@
         contactNumber = :contactNumber,
         guardianName = :guardianName,
         guardianAddress = :guardianAddress,
-        guardianContact = :guardianContact
+        guardianContact = :guardianContact,
+        gender = :gender,
+        civilStatus = :civil
         WHERE id = :id";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam("firstName",$firstName);
@@ -34,5 +38,7 @@
         $stmt->bindParam("guardianAddress",$guardianAddress);
         $stmt->bindParam("guardianContact",$guardianContact);
         $stmt->bindParam("id",$id);
+        $stmt->bindParam("gender",$gender);
+        $stmt->bindParam("civil",$civil);
         $stmt->execute();
 ?>

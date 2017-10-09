@@ -90,6 +90,8 @@
         $startDate = $_POST['startDate'];
         $endDate = $_POST['endDate'];
         $collectionDay = $_POST['collectionDay'];
+        $gender = $_POST['gender'];
+        $civil = $_POST['civil'];
 
         if(isset($_GET['tid'])){
             $sql = "SELECT balance from _tenantprofile WHERE id = :tid";
@@ -106,12 +108,14 @@
             $stmt->bindParam('balance', $b); 
         }
         else{
-            $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, username, password, address, email, contactNumber, guardianName, guardianAddress, guardianContact, oid, balance) VALUES (:firstName, :lastName, :username, :password, :address, :email, :contactNumber, :guardianName, :guardianAddress, :guardianContact, :oid, :balance)";
+            $sql = "INSERT INTO `_tenantprofile` (firstName, lastName, username, password, address, email, contactNumber, guardianName, guardianAddress, guardianContact, oid, balance, gender, civilStatus) VALUES (:firstName, :lastName, :username, :password, :address, :email, :contactNumber, :guardianName, :guardianAddress, :guardianContact, :oid, :balance)";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam('username',$userName);
             $stmt->bindParam('password',$password);
             $stmt->bindParam('oid',$_SESSION['id']); 
             $stmt->bindParam('balance',$balance);
+            $stmt->bindParam('gender',$gender);
+            $stmt->bindParam('civilStatus',$civil);
 
         }
         $stmt->bindParam('firstName',$firstName);
@@ -139,8 +143,14 @@
         $unitid=$stmt->fetch(PDO::FETCH_ASSOC);
 
 
-
-        $sql = "INSERT INTO `_tenantrentinginformation` (tid, uid, downpayment, startDate, endDate, totalMonths, collectionDay, balance, adjustedRentPerMonth) VALUES (:tid, :uid, :downpayment, :startDate, :endDate, :totalMonths, :collectionDay, :balance, :adjustedRentPerMonth)";
+        if(isset($_GET['tid'])){
+            $sql = "UPDATE `_tenantrentinginformation` SET
+            tid = :tid, uid =:uid, downpayment = :downpayment, startDate = :startDate, endDate = :endDate, 
+            totalMonths = :totalMonths, collectionDay = :collectionDay, balance = :balance, adjustedRentPerMonth = :adjustedRentPerMonth, status = '1' WHERE tid = :tid";
+        }
+        else{
+            $sql = "INSERT INTO `_tenantrentinginformation` (tid, uid, downpayment, startDate, endDate, totalMonths, collectionDay, balance, adjustedRentPerMonth, status) VALUES (:tid, :uid, :downpayment, :startDate, :endDate, :totalMonths, :collectionDay, :balance, :adjustedRentPerMonth, '1')";
+        }
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':downpayment',$downpayment);
         $stmt->bindParam(':startDate',$startDate);
@@ -288,6 +298,11 @@
                             Add Unit
                         </a>
                     </li>
+                    <li>
+                        <a class="left-menu-link" href="unitedit.php">
+                            Edit Unit
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
@@ -306,17 +321,19 @@
                             Add Tenant
                         </a>
                     </li>
-                    <li>
-                        <a class="left-menu-link" href="unitedit.php">
-                            Edit Unit
-                        </a>
-                    </li>
+                    
                 </ul>
             </li>
             <li>
                 <a class="left-menu-link" href="bill.php">
                     <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
                     Billing
+                </a>
+            </li>
+            <li>
+                <a class="left-menu-link" href="report.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
+                    Report
                 </a>
             </li>
             <li class="left-menu-list-separator"><!-- --></li>
@@ -401,6 +418,33 @@
 
                             <div class="form-group row">
                                 <div class="col-md-3">
+                                    <label class="form-control-label" for="l0">Gender</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <select class="form-control" id="gender" name="gender">
+                                        <option value = 'M'>Male</option>
+                                        <option value = 'F'>Female</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="form-control-label" for="l0">Civil Status</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <select class="form-control" id="civil" name="civil">
+                                        <option value = 'Single'>Single</option>
+                                        <option value = 'Married'>Married</option>
+                                        <option value = 'Divorced'>Divorced</option>
+                                        <option value = 'Separated'>Separated</option>
+                                        <option value = 'Widowed'>Widowed</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-3">
                                     <label class="form-control-label" for="l0">Permanent Address</label>
                                 </div>
                                 <div class="col-md-9">
@@ -434,28 +478,28 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l0">Parent/Guardian Name</label>
+                                    <label class="form-control-label" for="l0">Emergency Contact Name</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Parent/Guardian Name" id="l0" name="guardianName"
+                                    <input type="text" class="form-control" placeholder="Emergency Contact Name" id="l0" name="guardianName"
                                     data-validation=[NOTEMPTY] value="<?php echo $guardianName;?>">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l0">Parent/Guardian Address</label>
+                                    <label class="form-control-label" for="l0">Emergency Contact Address</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Parent/Guardian Address" id="l0" name="guardianAddress" 
+                                    <input type="text" class="form-control" placeholder="Emergency Contact Address" id="l0" name="guardianAddress" 
                                     data-validation=[NOTEMPTY] value="<?php echo $guardianAddress;?>">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="l0">Parent/Guardian Contact No.</label>
+                                    <label class="form-control-label" for="l0">Emergency Contact No.</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="Parent/Guardian Contact No." id="guardianContact" name="guardianContact"
+                                    <input type="text" class="form-control" placeholder="Emergency Contact No." id="guardianContact" name="guardianContact"
                                     data-validation=[NOTEMPTY] value="<?php echo $guardianContact;?>">
                                     <small class="text-muted">Phone number input: (0999) 123-4567</small>
                                 </div>
@@ -624,7 +668,7 @@
                             <div class="form-actions">
                                 <div class="form-group row">
                                     <div class="col-md-9 col-md-offset-3">
-                                        <button type="submit" class="btn width-150 btn-primary">Submit</button>
+                                        <button type="submit" id="sub" class="btn width-150 btn-primary">Submit</button>
                                         <button type="button" class="btn btn-default">Cancel</button>
                                     </div>
                                 </div>
@@ -685,7 +729,7 @@
 
         a = parseInt(runningTotal.value) + parseInt(addP.value);
         b = a - parseInt(disc.value) - parseInt(dp.value);
-        var total = parseFloat(b/parseInt(totalMonth.value));
+        var total = Math.floor(parseFloat(b/parseInt(totalMonth.value)));
 
         var selbox = document.mainf.aRPM;
         $.ajax
@@ -781,11 +825,20 @@
                 var totalPayment = quotient * t.value;
                 var rentPerMonth = Math.floor(totalPayment/quotient);
 
+                if(quotient <= 0){
+                    alert("Renting month must be greater than 0.");
+                    document.getElementById("sub").disabled = true;
+                }
+                else{
+                    $('#aRPMt').val(rentPerMonth);                
+                    $('#totalMonth').val(quotient);
+                    $('#totalMRent').val(totalPayment);
+                    $('#totalDays').val(remainder);
+                    document.getElementById("sub").disabled = false;
+                }
+
                 //alert("The tenant will have "+quotient+" paying months with "+remainder+" days to spare");
-                $('#aRPMt').val(rentPerMonth);                
-                $('#totalMonth').val(quotient);
-                $('#totalMRent').val(totalPayment);
-                $('#totalDays').val(remainder);
+                
             }
         });
 

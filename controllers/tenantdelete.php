@@ -19,20 +19,21 @@
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
-                                <h4 class="modal-title" id="myModalLabel">Tenant has Unpaid Bills</h4>
+                                <h4 class="modal-title" id="myModalLabel"><!--Tenant has Unpaid Bills--></h4>
                             </div>
                             <div class="modal-body">
                             	<div class="alert alert-primary" role="alert">
                             		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 		<span aria-hidden="true">&times;</span>
                             		</button>
-                           			<strong>Note!</strong> Tenant has unpaid bills. Deleting tenant will also delete bill records. 
+                                    <strong> Are you sure?
+                           			<!--<strong>Note!</strong> Tenant has unpaid bills. Deleting tenant will also delete bill records. -->
                         		</div>
                             </div>
                             <form>
                             <div class="modal-footer">
                                 <button type="button" class="btn" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-danger" name="deletetenant" onclick="deleteT('.$_POST['tid'].');">Delete</button>
+                                <button type="button" class="btn btn-danger" name="deletetenant" onclick="deleteT('.$_POST['tid'].');">End Renting Term</button>
 
                             </div>
                             </form>
@@ -86,20 +87,21 @@
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
-                                <h4 class="modal-title" id="myModalLabel">Tenant has excess payment</h4>
+                                <h4 class="modal-title" id="myModalLabel"><!--Tenant has excess payment--></h4>
                             </div>
                             <div class="modal-body">
                             	<div class="alert alert-primary" role="alert">
                             		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 		<span aria-hidden="true">&times;</span>
                             		</button>
-                           			<strong>Note!</strong> Excess Payment is Php '.doubleval($excess).' deleting will erase this data.
+                                    <strong> Are you sure?
+                           			<!--<strong>Note!</strong> Unpaid Payment is Php '.doubleval($excess).' deleting will erase this data.-->
                         		</div>
                             </div>
                             <form>
                             <div class="modal-footer">
                                 <button type="button" class="btn" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-danger" name="deletetenant" onclick="deleteT('.$_POST['tid'].');">Delete</button>
+                                <button type="button" class="btn btn-danger" name="deletetenant" onclick="deleteT('.$_POST['tid'].');">End Renting Term</button>
                                 
                             </div>
                             </form>
@@ -122,13 +124,13 @@
                             		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 		<span aria-hidden="true">&times;</span>
                             		</button>
-                           			<strong>Note!</strong> Deleting will erase this data.
+                           			<strong>Are you sure?
                         		</div>
                             </div>
                             <form>
                             <div class="modal-footer">
                                 <button type="button" class="btn" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-danger" name="deletetenant" onclick="deleteT('.$_POST['tid'].');">Delete</button>
+                                <button type="button" class="btn btn-danger" name="deletetenant" onclick="deleteT('.$_POST['tid'].');">End Renting Term</button>
 
                             </div>
                             </form>

@@ -78,6 +78,12 @@
                     Billing
                 </a>
             </li>
+            <li>
+                <a class="left-menu-link" href="report.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
+                    Report
+                </a>
+            </li>
             <li class="left-menu-list-separator"><!-- --></li>
             <li class="left-menu-list-submenu">
                 <a class="left-menu-link" href="javascript: void(0);">
@@ -245,7 +251,7 @@
                     <div class="carousel-widget-2 carousel slide" data-ride="carousel">
                         <div class="carousel-inner" role="listbox">
                             <div class="carousel-item active">
-                                <a href="javascript: void(0);" class="widget-body">
+                                <a href="unitsummary.php" class="widget-body">
                                     <h2>
                                         <i class="icmn-database"></i> Available Units
                                     </h2>
@@ -256,7 +262,7 @@
                                 </a>
                             </div>
                             <div class="carousel-item">
-                                <a href="javascript: void(0);" class="widget-body">
+                                <a href="unitsummary.php" class="widget-body">
                                     <h2>
                                         <i class="icmn-users"></i> Tenants
                                     </h2>
@@ -311,7 +317,7 @@
                     <div class="carousel-widget-2 carousel slide" data-ride="carousel">
                         <div class="carousel-inner" role="listbox">
                             <div class="carousel-item active">
-                                <a href="javascript: void(0);" class="widget-body">
+                                <a href="profile.php" class="widget-body">
                                     <h2>Profile</h2>
                                     <p>
                                         Edit Current Profile

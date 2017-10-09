@@ -84,6 +84,7 @@
     <!-- Clean UI Scripts -->
     <script src="../assets/common/js/common.js"></script>
     <script src="../assets/common/js/demo.temp.js"></script>
+    <script src="../assets/common/js/jquery.masknumber.js"></script>
     <?php $salt = "imranimranhussain"; ?>
     <?php if(isset($_SESSION['current_user_tenant'])){header("location: logout.php");}?>
 </head>

@@ -1,31 +1,14 @@
 <?php
-  	include('../controllers/config.php');
+    include('../controllers/config.php');
     include('../controllers/session.php');
-    $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    include('head.php');
 
-    if(isset($_POST['password'])){
-        if($_POST['password'] != $_POST['confirmpassword']){
-            $_SESSION['usuccess'] == 'notmatch';
-        }
-        else{
-            $password = md5($salt.$_POST['password']);
-            $sql = "UPDATE _owner SET password = :pass";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':pass', $password);
-            if($stmt->execute()){
-                $_SESSION['usuccess'] == 'success';
-            }
-            else{
-                $_SESSION['usuccess'] == 'fail';
-            }
-        }
-        header('location: logout.php');
-    }
-    
+    //1 is occupied, 0 is available
+        $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-?>
+        //left-menu-list-active    
+    include('head.php'); 
+ ?>
 <body class="mode-default colorful-enabled theme-red">
 <nav class="left-menu" left-menu>
     <div class="logo-container">
@@ -98,14 +81,15 @@
                     Billing
                 </a>
             </li>
-            <li>
+             <li class="left-menu-list-active ">
                 <a class="left-menu-link" href="report.php">
                     <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
                     Report
                 </a>
             </li>
+            
             <li class="left-menu-list-separator"><!-- --></li>
-            <li class="left-menu-list-submenu left-menu-list-active">
+            <li class="left-menu-list-submenu">
                 <a class="left-menu-link" href="javascript: void(0);">
                     Current Profile
                 </a>
@@ -149,13 +133,12 @@
         </div>
     </div>
 </nav>
+    
 <section class="page-content">
 <div class="page-content-inner">
-
-    <!-- Basic Form Elements -->
-    <section class="panel">
+<section class="panel">
         <div class="panel-heading">
-            <h3>Change Password</h3>
+            <h3>Report Range</h3>
         </div>
         <div class="panel-body">
             <div class="row">
@@ -163,94 +146,103 @@
                     <div class="margin-bottom-50">
                         <br />
                         <!-- Horizontal Form -->
-                        <form  id="mainf" name="mainf" method="POST">
+                        <form>
                             <div class="form-group row">
                                 <div class="col-md-3">
-                                    <label class="form-control-label" for="password">Password</label>
+                                    <label class="form-control-label" for="rangeDate">Rent Duration</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="password" class="form-control" placeholder="Password" id="password" name="password" data-validation=[NOTEMPTY] value="">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group row">
-                                <div class="col-md-3">
-                                    <label class="form-control-label" for="confirmpassword">Confirm Password</label>
-                                </div>
-                                <div class="col-md-9">
-                                        <input type="password" class="form-control" placeholder="Confirm Password" id="confirmpassword" name="confirmpassword" data-validation=[NOTEMPTY] value="">
-                                </div>
-                            </div>
-                            <div class="form-actions">
-                                <div class="form-group row">
-                                    <div class="col-md-9 col-md-offset-3">    
-                                        <button type="submit" class="btn btn-success">Update</button>
+                                    <div class="col-md-6">
+                                        <input placeholder="From" type='text' class="form-control" id='startDate' name="startDate" data-validation=[NOTEMPTY] />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input placeholder="To" type='text' class="form-control" id='endDate' name="endDate" data-validation=[NOTEMPTY] />
                                     </div>
                                 </div>
                             </div>
-                        </form>   
+
+                           
+                            <div class="form-actions">
+                                <div class="form-group row">
+                                    <div class="col-md-12 col-md-offset-3">
+                                        <button type="button" name="submitUnit" onclick ="reportpop();"class="btn width-150 btn-primary">Submit</button>  
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- End Horizontal Form -->
                     </div>
                 </div>
             </div>
+             <section name="report_output" id="report_output"></section>
         </div>
     </section>
     <!-- End -->
+   
 
 </div>
 </section>
 
-<script type="text/javascript">
-    $('#mainf').validate({
-            submit: {
-                settings: {
-                    inputContainer: '.form-group',
-                    errorListClass: 'form-control-error',
-                    errorClass: 'has-danger'
-                }
-            }
+</div>
+</section>
+
+<div class="main-backdrop"><!-- --></div>
+
+</body>
+
+<script>
+    $(function(){
+        
+        $('#startDate').datetimepicker({
+                format: 'DD-MM-YYYY',
         });
+        $('#endDate').datetimepicker({
+                format: 'DD-MM-YYYY'
+        });
+    })
 </script>
-<?php
-    if($_SESSION['usuccess'] == 'success'){
-        ?>
-        <script type="text/javascript">
-        swal({
-                title: "All done!",
-                text: "Profile updated successfully",
-                type: "success",
-                confirmButtonClass: "btn-success",
-                confirmButtonText: "Success"
-            });
-    </script>
-    <?php
+<script type="text/javascript">
+    function reportpop(){
+                var date2 = $("#endDate").val();
+                var date1 = $("#startDate").val();
+                date1 = date1.split('-');
+                date2 = date2.split('-');
+                endDay = date2[0];
+                startDay = date1[0];
+                date1 = new Date(date1[2], date1[1], date1[0]);
+                date2 = new Date(date2[2], date2[1], date2[0]);
+                date1_unixtime = parseInt(date1.getTime() / 1000);
+                date2_unixtime = parseInt(date2.getTime() / 1000);
+                var timeDifference = date2_unixtime - date1_unixtime;
+                var timeDifferenceInHours = timeDifference / 60 / 60;
+                var timeDifferenceInDays = timeDifferenceInHours  / 24;
+
+                var quotient = Math.floor(timeDifferenceInDays/30);
+
+                if(quotient <= 0){
+                     alert("Renting month must be greater than 0.");
+                }
+                else{
+                    pop();
+        
+                }
     }
-    if($_SESSION['usuccess'] == 'fail'){
-        ?>
-        <script type="text/javascript">
-        swal({ 
-                title: "Error",
-                text: "Server Problem, try again later.",
-                type: "error" 
-                //},
-                  //  function(){
-                  //  window.location.href = 'login.html';
-            });
-    </script>
-        <?php
+    function pop(){
+        var selbox = document.report_output;
+        var date2 = $("#endDate").val();
+        var date1 = $("#startDate").val();
+        $.ajax
+        ({
+            type: "POST",
+            url: "../controllers/reportmain.php",
+            data: {date1 :date1, date2 :date2},
+            cache: false,
+            success: function(result)
+            {   
+                //alert(result);
+                $("#report_output").html(result);
+
+            } 
+        })
     }
-    if($_SESSION['usuccess'] == 'notmatch'){
-        ?>
-        <script type="text/javascript">
-        swal({ 
-                title: "Error",
-                text: "Passwords do not match, password unchanged!",
-                type: "error" 
-                //},
-                  //  function(){
-                  //  window.location.href = 'login.html';
-            });
-    </script>
-        <?php
-    }
-    $_SESSION['usuccess'] = 'undefined';
-?>
+</script>

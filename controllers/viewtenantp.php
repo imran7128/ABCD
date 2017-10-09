@@ -4,7 +4,7 @@ if($_POST['tid']){
     include('session.php');
     $conn = new PDO("mysql:host={$host};dbname={$dbname}",$user,$pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = "SELECT id, firstName, lastName, address, email, contactNumber, guardianName, guardianAddress, guardianContact FROM _tenantprofile WHERE id = '".$_POST['tid']."'";
+    $sql = "SELECT id, firstName, lastName, address, email, contactNumber, guardianName, guardianAddress, guardianContact, gender, civilStatus FROM _tenantprofile WHERE id = '".$_POST['tid']."'";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -47,6 +47,24 @@ if($_POST['tid']){
                                 		</div>
                             		</div>
 
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">Gender</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="Gender" id="gender" name="gender" data-validation=[NOTEMPTY] value="'.$result['gender'].'">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-3">
+                                            <label class="form-control-label" for="l0">Civil Status</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" placeholder="Civil Status" id="civil" name="civil" data-validation=[NOTEMPTY] value="'.$result['civil'].'">
+                                        </div>
+                                    </div>
+
                             		<div class="form-group row">
                                 		<div class="col-md-3">
                                     		<label class="form-control-label" for="l0">Address</label>
@@ -77,7 +95,7 @@ if($_POST['tid']){
 
                             		<div class="form-group row">
                                 		<div class="col-md-3">
-                                    		<label class="form-control-label" for="l0">Guardian Name</label>
+                                    		<label class="form-control-label" for="l0">Emergency Contact Name</label>
                                 		</div>
                                 		<div class="col-md-9">
                                     		<input type="text" class="form-control" placeholder="First Name" id="guardianName" name="guardianName" data-validation=[NOTEMPTY] value="'.$result['guardianName'].'">
@@ -86,7 +104,7 @@ if($_POST['tid']){
 
                             		<div class="form-group row">
                                 		<div class="col-md-3">
-                                    		<label class="form-control-label" for="l0">Guardian Address</label>
+                                    		<label class="form-control-label" for="l0">Emergency Contact Address</label>
                                 		</div>
                                 		<div class="col-md-9">
                                     		<input type="text" class="form-control" placeholder="First Name" id="guardianAddress" name="guardianAddress" data-validation=[NOTEMPTY] value="'.$result['guardianAddress'].'">
@@ -95,7 +113,7 @@ if($_POST['tid']){
 
                             		<div class="form-group row">
                                 		<div class="col-md-3">
-                                    		<label class="form-control-label" for="l0">Guardian Contact Number</label>
+                                    		<label class="form-control-label" for="l0">Emergency Contact Number</label>
                                 		</div>
                                 		<div class="col-md-9">
                                     		<input type="text" class="form-control" placeholder="First Name" id="guardianContact" name="guardianContact" data-validation=[NOTEMPTY] value="'.$result['guardianContact'].'">

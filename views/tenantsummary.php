@@ -83,7 +83,12 @@
                     Billing
                 </a>
             </li>
-            
+            <li>
+                <a class="left-menu-link" href="report.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
+                    Report
+                </a>
+            </li>
             <li class="left-menu-list-separator"><!-- --></li>
             <li class="left-menu-list-submenu">
                 <a class="left-menu-link" href="javascript: void(0);">
@@ -173,7 +178,7 @@
                                 $currentMonth = date('m');
                                 $currentYear = date('Y');
                                 $tenantDay = "";
-                                $sql = "SELECT  _tenantprofile.firstName as fName, _tenantprofile.lastName as lName, _tenantrentinginformation.uid as uid, _tenantrentinginformation.adjustedRentPerMonth as rpm, _tenantprofile.balance as balance, _tenantprofile.id as tenantid, _tenantrentinginformation.id as trid FROM _tenantrentinginformation INNER JOIN _tenantprofile ON _tenantrentinginformation.tid = _tenantprofile.id WHERE _tenantprofile.oid = :id";
+                                $sql = "SELECT  _tenantprofile.firstName as fName, _tenantprofile.lastName as lName, _tenantrentinginformation.uid as uid, _tenantrentinginformation.adjustedRentPerMonth as rpm, _tenantprofile.balance as balance, _tenantprofile.id as tenantid, _tenantrentinginformation.id as trid FROM _tenantrentinginformation INNER JOIN _tenantprofile ON _tenantrentinginformation.tid = _tenantprofile.id WHERE _tenantprofile.oid = :id AND _tenantrentinginformation.status = '1'";
                                 $stmt = $conn->prepare($sql);
                                 $stmt->bindParam('id', $_SESSION['id']);
                                 $stmt->execute();
@@ -217,7 +222,8 @@
                                     echo '<td>'.$result['unitName'].'</td>';
                                     echo '<td>'.$row['rpm'].'</td>';
                                     echo '<td><button class="btn btn-warning" onclick="launchModal('.$row['tenantid'].');">View/Edit</td>';
-                                    echo '<td><button class="btn btn-danger" onclick="deleteTenant('.$row['tenantid'].');">Delete Tenant</td>';
+                                    echo '<td><button class="btn btn-danger" onclick="deleteTenant('.$row['tenantid'].');">End Term</td>';
+                                   
                                     echo '</tr>';
 
                                 }
@@ -260,6 +266,7 @@
                             <tbody>
                             <?php
                                 $sql = "SELECT firstName, lastName, balance, id FROM _tenantprofile WHERE id NOT IN (SELECT tid FROM _tenantrentinginformation) AND oid = :id";
+                                $sql = "SELECT  _tenantprofile.firstName as firstName, _tenantprofile.lastName as lastName, _tenantprofile.balance as balance, _tenantprofile.id as id, _tenantrentinginformation.id as trid FROM _tenantrentinginformation INNER JOIN _tenantprofile ON _tenantrentinginformation.tid = _tenantprofile.id WHERE _tenantprofile.oid = :id AND _tenantrentinginformation.status = '0'";
                                 $stmt =  $conn->prepare($sql);
                                 $stmt->bindParam('id', $_SESSION['id']);
                                 $stmt->execute();
@@ -436,6 +443,9 @@
         var guardianName = $('#guardianName').val();
         var guardianAddress = $('#guardianAddress').val();
         var guardianContact = $('#guardianContact').val();
+        var gender = $('#gender').val();
+        var civil = $('#civil').val();
+
 
         $.ajax({
             url: "../controllers/tenantupdate.php",
@@ -443,7 +453,8 @@
             data:
             {
                 id: id, fName: fName, lName: lName, email: email, address: address, contactNumber: contactNumber,
-                guardianName: guardianName, guardianContact: guardianContact, guardianAddress: guardianAddress
+                guardianName: guardianName, guardianContact: guardianContact, guardianAddress: guardianAddress,
+                gender: gender, civil: civil
             },
             success: function(){
                 $('#tview').modal('hide');

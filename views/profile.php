@@ -121,7 +121,12 @@
                     Billing
                 </a>
             </li>
-
+            <li>
+                <a class="left-menu-link" href="report.php">
+                    <i class="left-menu-link-icon icmn-calendar"><!-- --></i>
+                    Report
+                </a>
+            </li>
             <li class="left-menu-list-separator"><!-- --></li>
             <li class="left-menu-list-submenu left-menu-list-active">
                 <a class="left-menu-link" href="javascript: void(0);">
